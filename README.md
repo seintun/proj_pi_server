@@ -119,6 +119,24 @@ git clone git@github.com:seintun/proj_pi_server.git
 cd proj_pi_server
 ```
 
+
+## Create virtual environment
+```sh
+python3 -m venv myenv
+```
+Activate the virtual environment:
+On macOS/Linux:
+```sh
+source myenv/bin/activate
+```
+On Windows:
+```sh
+myenv\Scripts\activate
+```
+Install packages:
+```sh
+pip install -r requirements.txt
+```
 ---
 
 ## 🏰 **Step 7: Build and Run the Flask Listener in Docker**
