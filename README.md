@@ -122,16 +122,16 @@ cd proj_pi_server
 
 ## Create virtual environment
 ```sh
-python3 -m venv myenv
+python3 -m venv venv
 ```
 Activate the virtual environment:
 On macOS/Linux:
 ```sh
-source myenv/bin/activate
+source venv/bin/activate
 ```
 On Windows:
 ```sh
-myenv\Scripts\activate
+venv\Scripts\activate
 ```
 Install packages:
 ```sh
