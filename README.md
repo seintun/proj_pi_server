@@ -177,23 +177,48 @@ docker restart flask_listener
 
 ---
 
-## ❌ **Step 10: Remove All Docker Containers (If Needed)**
-To delete all Docker containers:
+## ❌ **Step 10: Remove All Docker (containers, images, networks, and volumes) (If Needed)**
+
+To remove everything at once (containers, images, networks, and volumes), you can use:
 
 ```sh
-docker rm -f $(docker ps -aq)
+docker system prune -a --volumes -f
 ```
 
-To remove all images:
+---
+
+## ♻️ **Maintenance Commands**
+
+### **Stop Container**
 
 ```sh
-docker rmi -f $(docker images -aq)
+docker stop flask_listener
 ```
 
-To clean up everything (containers, images, volumes):
+### **Restart Container**
 
 ```sh
-docker system prune -a --volumes
+docker restart flask_listener
+```
+
+### **Remove Container**
+
+```sh
+docker rm flask_listener
+```
+
+### **Auto-Restart on Boot**
+
+```sh
+docker update --restart unless-stopped flask_listener
+```
+
+### **Remove Docker Resources**
+
+Remove everything (containers, images, networks, and volumes):
+
+```sh
+docker system prune -a --volumes -f
 ```
 
 ---
