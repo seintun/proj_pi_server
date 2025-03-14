@@ -137,6 +137,10 @@ Install packages:
 ```sh
 pip install -r requirements.txt
 ```
+Start server:
+```sh
+python app.py
+```
 ---
 
 ## 🏰 **Step 7: Build and Run the Flask Listener in Docker**
