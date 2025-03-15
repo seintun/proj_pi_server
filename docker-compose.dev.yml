@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: robot-dashboard
+    container_name: robot-dashboard
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app  # Mount current directory for development
+      - ./data:/app/data  # Persistent data storage
+    devices:
+      - /dev/video0:/dev/video0  # Camera access
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 800M
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
+    command: >
+      sh -c "pip install -e . &&
+             python -m flask run --host=0.0.0.0 --port=5000 --reload"
