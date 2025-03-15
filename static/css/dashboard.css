@@ -1,0 +1,192 @@
+/* Dashboard Styles */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+/* Base Styles */
+body {
+    font-family: 'Roboto Mono', monospace;
+    background-color: #121212;
+    color: #ffdb15;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    height: 100vh;
+}
+
+.container {
+    background-color: #1E1E1E;
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px #ffdb15;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+/* Grid Layout */
+#system-stats { grid-column: 1; grid-row: 1; }
+#camera-feed { grid-column: 2; grid-row: 1; }
+#toggle-mode { grid-column: 3; grid-row: 1; }
+#robot-path { grid-column: 2; grid-row: 3; }
+#arm-gripper { grid-column: 1; grid-row: 3; }
+#joystick { grid-column: 3; grid-row: 3; }
+
+/* Charts Container */
+.charts-container {
+    grid-column: span 3;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 15px;
+    background: #1E1E1E;
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    margin: 10px;
+}
+
+.chart-wrapper {
+    height: 150px;
+    background: #000;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #ffdb15;
+}
+
+/* System Stats and Sensor Data */
+.system-stats {
+    width: 100%;
+    border: 2px solid #ffdb15;
+    border-radius: 10px;
+    background-color: #000;
+    padding: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 0 20px #ffdb15;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    color: #ffdb15;
+    font-weight: bold;
+    text-shadow: 0 0 5px #ffdb15;
+}
+
+/* Video Feed */
+.video-feed {
+    width: 100%;
+    height: 100%;
+    border: 2px solid #ffdb15;
+    border-radius: 10px;
+    background-color: #000;
+    overflow: hidden;
+    position: relative;
+}
+
+.video-feed img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.video-control-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: auto !important;
+    height: 40px !important;
+    padding: 0 15px;
+    font-size: 14px !important;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.video-control-btn:hover {
+    opacity: 1;
+}
+
+.video-control-btn.error {
+    background-color: #ff4444;
+    animation: shake 0.5s linear;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Controls */
+button {
+    width: 80%;
+    height: 50px;
+    font-size: 1.2em;
+    font-family: 'Roboto Mono', monospace;
+    background-color: #ffdb15;
+    color: #121212;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 5px;
+    box-shadow: 0 4px 10px #ffdb15;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+button:active {
+    background-color: #fcc303;
+    box-shadow: 0 0 15px #fcc303, 0 0 30px #fcc303;
+}
+
+/* Joystick Controls */
+.joystick {
+    display: grid;
+    grid-template-areas:
+        ". up ."
+        "left . right"
+        ". down .";
+    gap: 10px;
+}
+
+.joystick button {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    border-radius: 50%;
+}
+
+/* Critical Value Indicators */
+.critical {
+    color: #ff4444;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { text-shadow: 0 0 5px #ff4444; }
+    50% { text-shadow: 0 0 20px #ff4444; }
+    100% { text-shadow: 0 0 5px #ff4444; }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    body {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+    }
+    
+    .charts-container {
+        grid-column: span 2;
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-wrapper {
+        height: 120px;
+    }
+}
