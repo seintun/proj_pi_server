@@ -140,25 +140,45 @@ body {
     border-radius: 8px;
 }
 
-.video-control-btn {
+.video-controls {
     position: absolute;
     bottom: 10px;
     right: 10px;
+    z-index: 10;
+}
+
+.video-toggle-btn {
     width: auto !important;
     height: 40px !important;
     padding: 0 15px;
     font-size: 14px !important;
+    background: rgba(30, 30, 30, 0.8);
+    border: 1px solid #ffdb15;
+    color: #ffdb15;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     opacity: 0.8;
-    transition: opacity 0.3s ease;
-    z-index: 10;
+    transition: all 0.3s ease;
 }
 
-.video-control-btn:hover {
+.video-toggle-btn:hover {
     opacity: 1;
+    background: rgba(30, 30, 30, 0.9);
 }
 
-.video-control-btn.error {
-    background-color: #ff4444;
+.video-toggle-btn .status-icon {
+    color: #00ff00;
+    font-size: 12px;
+    transition: color 0.3s ease;
+}
+
+.video-toggle-btn .status-icon.off {
+    color: #ff4444;
+}
+
+.video-toggle-btn.error {
+    background-color: rgba(255, 68, 68, 0.8);
     animation: shake 0.5s linear;
 }
 

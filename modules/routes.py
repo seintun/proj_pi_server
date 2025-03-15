@@ -1,12 +1,11 @@
-from flask import Blueprint, render_template, Response, send_file
+from flask import Blueprint, render_template, Response, send_file, jsonify
 import json
 import time
 import os
 from .monitor import SystemMonitor
-from .video_stream import VideoStream
+from .video_stream import video_stream  # Import the singleton instance
 
 routes = Blueprint('routes', __name__)
-video_stream = None  # Global instance for video stream
 system_monitor = SystemMonitor()
 
 @routes.route('/')
@@ -61,22 +60,19 @@ def video_feed():
         '''
         return Response(html, mimetype='text/html')
 
-@routes.route('/video_feed/stop')
-def stop_video_feed():
-    """Stop the video stream to save resources"""
-    global video_stream
-    if video_stream:
-        video_stream.release()
-        video_stream = None
-    return {'status': 'success', 'message': 'Video feed stopped'}
-
-@routes.route('/video_feed/start')
-def start_video_feed():
-    """Start the video stream"""
-    global video_stream
+@routes.route('/video/toggle', methods=['POST'])
+def toggle_video():
+    """Toggle video stream on/off"""
     try:
-        if not video_stream:
-            video_stream = VideoStream()
-        return {'status': 'success', 'message': 'Video feed started'}
+        is_streaming = video_stream.toggle_stream()
+        return jsonify({
+            'status': 'success',
+            'streaming': is_streaming,
+            'message': 'Video stream toggled successfully'
+        })
     except Exception as e:
-        return {'status': 'error', 'message': str(e)}, 503
+        return jsonify({
+            'status': 'error',
+            'streaming': False,
+            'message': str(e)
+        }), 503

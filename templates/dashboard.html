@@ -44,6 +44,12 @@
         <h2>Camera Feed</h2>
         <div class="video-feed">
             <img src="{{ url_for('routes.video_feed') }}" alt="Camera Feed">
+            <div class="video-controls">
+                <button class="video-toggle-btn">
+                    <span class="status-icon">⚫</span>
+                    <span class="status-text">Stop Stream</span>
+                </button>
+            </div>
         </div>
     </div>
 
