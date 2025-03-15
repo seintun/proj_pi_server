@@ -22,9 +22,22 @@ class DashboardUI {
                 y: {
                     grid: {
                         color: 'rgba(255, 219, 21, 0.1)',
-                        borderColor: '#ffdb15'
+                        drawBorder: false
                     },
-                    ticks: { color: '#ffdb15' }
+                    ticks: { 
+                        color: '#ffdb15',
+                        font: {
+                            family: 'Roboto Mono'
+                        }
+                    }
+                }
+            },
+            layout: {
+                padding: {
+                    top: 20,
+                    right: 10,
+                    bottom: 10,
+                    left: 10
                 }
             },
             elements: {
@@ -56,8 +69,12 @@ class DashboardUI {
                         ...commonOptions.scales,
                         y: {
                             ...commonOptions.scales.y,
+                            min: 0,
                             max: 100,
-                            min: 0
+                            ticks: {
+                                ...commonOptions.scales.y.ticks,
+                                callback: value => value + '%'
+                            }
                         }
                     }
                 }
@@ -80,8 +97,12 @@ class DashboardUI {
                         ...commonOptions.scales,
                         y: {
                             ...commonOptions.scales.y,
+                            min: 0,
                             max: 100,
-                            min: 0
+                            ticks: {
+                                ...commonOptions.scales.y.ticks,
+                                callback: value => value + '%'
+                            }
                         }
                     }
                 }
@@ -104,8 +125,12 @@ class DashboardUI {
                         ...commonOptions.scales,
                         y: {
                             ...commonOptions.scales.y,
+                            min: 30,
                             max: 85,
-                            min: 30
+                            ticks: {
+                                ...commonOptions.scales.y.ticks,
+                                callback: value => value + '°C'
+                            }
                         }
                     }
                 }
@@ -131,17 +156,29 @@ class DashboardUI {
     }
 
     updateStats(data) {
-        // Queue updates for next animation frame
+        // Queue CPU updates
+        this.pendingUpdates.set('cpuUsage', `${data.cpu.usage}%`);
         this.pendingUpdates.set('cpuTemp', `${data.temperature}°C`);
-        this.pendingUpdates.set('cpuUsage', `${data.cpu_usage}%`);
-        this.pendingUpdates.set('ramUsage', `${data.ram_usage}%`);
+        this.pendingUpdates.set('cpuCores', data.cpu.cores);
+        this.pendingUpdates.set('cpuThreads', data.cpu.threads);
+        this.pendingUpdates.set('cpuFreq', `${data.cpu.frequency} MHz`);
 
-        // Check for critical temperature
+        // Queue Memory updates with formatted values
+        this.pendingUpdates.set('ramUsage', `${data.memory.percent || 0}%`);
+        this.pendingUpdates.set('memTotal', data.memory.total_formatted || '0 MB');
+        this.pendingUpdates.set('memUsed', data.memory.used_formatted || '0 MB');
+        this.pendingUpdates.set('memFree', data.memory.free_formatted || '0 MB');
+
+        // Check for critical temperature (with default value)
         const tempElement = document.getElementById('cpuTemp');
-        if (data.temperature > 80) {
-            tempElement.classList.add('critical');
-        } else {
-            tempElement.classList.remove('critical');
+        const temp = data.temperature ?? 0;
+        
+        if (tempElement) {
+            if (temp > 80) {
+                tempElement.classList.add('critical');
+            } else {
+                tempElement.classList.remove('critical');
+            }
         }
 
         if (!this.frameRequested) {
@@ -165,10 +202,10 @@ class DashboardUI {
         const timestamp = new Date().toLocaleTimeString();
 
         // Update CPU chart
-        this.updateChart(this.charts.cpu, data.cpu_usage, timestamp);
+        this.updateChart(this.charts.cpu, data.cpu.usage, timestamp);
 
         // Update RAM chart
-        this.updateChart(this.charts.ram, data.ram_usage, timestamp);
+        this.updateChart(this.charts.ram, data.memory.percent, timestamp);
 
         // Update Temperature chart
         this.updateChart(this.charts.temp, data.temperature, timestamp);

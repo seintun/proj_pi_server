@@ -4,3 +4,5 @@ Werkzeug==3.0.1
 opencv-python==4.8.1.78
 numpy==1.24.3
 gunicorn==21.2.0
+colorlog==6.8.0  # For better logging output
+Flask-Cors==4.0.0  # For cross-origin requests if needed

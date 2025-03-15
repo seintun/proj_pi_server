@@ -54,8 +54,27 @@ body {
     height: 150px;
     background: #000;
     border-radius: 10px;
-    padding: 10px;
+    padding: 15px;
     border: 1px solid #ffdb15;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-wrapper h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    z-index: 1;
+}
+
+.chart-wrapper canvas {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 /* System Stats and Sensor Data */
@@ -64,17 +83,43 @@ body {
     border: 2px solid #ffdb15;
     border-radius: 10px;
     background-color: #000;
-    padding: 10px;
+    padding: 15px;
     box-sizing: border-box;
     box-shadow: 0 0 20px #ffdb15;
-    font-size: 18px;
-    margin-bottom: 10px;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.stat-group {
+    margin-bottom: 15px;
+}
+
+.stat-group h3 {
+    color: #ffdb15;
+    font-size: 16px;
+    margin: 0 0 10px 0;
+    text-shadow: 0 0 5px #ffdb15;
+}
+
+.stat-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.stat-list li {
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
 }
 
 .stat-value {
     color: #ffdb15;
     font-weight: bold;
     text-shadow: 0 0 5px #ffdb15;
+    margin-left: 10px;
 }
 
 /* Video Feed */
@@ -115,12 +160,6 @@ body {
 .video-control-btn.error {
     background-color: #ff4444;
     animation: shake 0.5s linear;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
 }
 
 /* Controls */
@@ -172,6 +211,12 @@ button:active {
     0% { text-shadow: 0 0 5px #ff4444; }
     50% { text-shadow: 0 0 20px #ff4444; }
     100% { text-shadow: 0 0 5px #ff4444; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
 }
 
 /* Responsive Design */

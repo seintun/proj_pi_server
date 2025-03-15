@@ -1,6 +1,7 @@
 from .cpu import CPUMonitor
 from .memory import MemoryMonitor
 from .temperature import TemperatureMonitor
+from .system_info import get_cpu_info, get_memory_info, format_memory_size
 import time
 
 class SystemMonitor:
@@ -40,9 +41,20 @@ class SystemMonitor:
         }
     
     def get_minimal_stats(self):
-        """Get current values only without history for lighter payload"""
+        """Get current values with detailed system information"""
+        # Get CPU information
+        cpu_info = get_cpu_info()
+        cpu_info['usage'] = self.cpu.get_usage()
+        
+        # Get memory information
+        memory_info = get_memory_info()
+        # Convert to human readable format
+        memory_info['total_formatted'] = format_memory_size(memory_info['total'])
+        memory_info['used_formatted'] = format_memory_size(memory_info['used'])
+        memory_info['free_formatted'] = format_memory_size(memory_info['free'])
+        
         return {
-            'cpu_usage': self.cpu.get_usage(),
-            'ram_usage': self.memory.get_usage(),
+            'cpu': cpu_info,
+            'memory': memory_info,
             'temperature': self.temperature.get_temperature()
         }
