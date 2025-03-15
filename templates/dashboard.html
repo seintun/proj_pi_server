@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Control Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <script src="{{ url_for('static', filename='vendor/chart.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/video-control.js') }}"></script>
+</head>
+
+<body>
+    <div class="container" id="system-stats">
+        <h2>System Stats</h2>
+        <div class="system-stats">
+            <div class="stat-group">
+                <h3>CPU Information</h3>
+                <div class="cpu-stats">
+                    <div class="cpu-line">
+                        <span id="cpuUsage" class="stat-value">--%</span> @
+                        <span id="cpuTemp" class="stat-value">--°C</span>
+                    </div>
+                    <div class="cpu-line">
+                        <span id="cpuCores" class="stat-value">--</span>Cores/<span id="cpuThreads"
+                            class="stat-value">--</span>Threads @
+                        <span id="cpuFreq" class="stat-value">-- MHz</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-group">
+                <h3>Memory Information</h3>
+                <div class="memory-line">
+                    <span class="memory-stat">
+                        <span id="memUsed" class="stat-value">-- GB</span> / <span id="memTotal" class="stat-value">--
+                            GB</span>
+                        (<span id="ramUsage" class="stat-value">--%</span>)
+                    </span>
+                </div>
+            </div>
+        </div>
+        <h2>Sensor Feedback</h2>
+        <div class="system-stats">
+            <p>Ultrasonic: <span id="ultrassonicSensor" class="stat-value">--mm</span></p>
+            <p>Lidar: <span id="lidarSensor" class="stat-value">--mm</span></p>
+        </div>
+    </div>
+
+    <div class="container" id="camera-feed">
+        <h2>Camera Feed</h2>
+        <div class="video-feed">
+            <div class="camera-status">
+                <div id="camera-status-icon" class="camera-status-icon"></div>
+            </div>
+            <img src="{{ url_for('routes.video_feed') }}" alt="Camera Feed">
+            <div class="video-controls">
+                <button class="video-toggle-btn">
+                    <span class="status-icon">🔴</span>
+                    <span class="status-text">Stop Stream</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="toggle-mode">
+        <button id="toggleMode">AI Mode</button>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-wrapper">
+            <h3>CPU Usage</h3>
+            <canvas id="cpuChart"></canvas>
+        </div>
+        <div class="chart-wrapper">
+            <h3>RAM Usage</h3>
+            <canvas id="ramChart"></canvas>
+        </div>
+        <div class="chart-wrapper">
+            <h3>Temperature</h3>
+            <canvas id="tempChart"></canvas>
+        </div>
+    </div>
+
+    <div class="container" id="arm-gripper">
+        <div class="arm-gripper">
+            <button style="grid-area: ul;" id="raiseArm">Raise Arm</button>
+            <button style="grid-area: dl;" id="lowerArm">Lower Arm</button>
+            <button style="grid-area: ur;" id="openGripper">Open Gripper</button>
+            <button style="grid-area: dr;" id="closeGripper">Close Gripper</button>
+        </div>
+    </div>
+
+    <div class="container" id="robot-path">
+        <h2>Robot Path</h2>
+        <div class="path-display">
+            <canvas id="pathCanvas"></canvas>
+        </div>
+    </div>
+
+    <div class="container" id="joystick">
+        <div class="joystick">
+            <button style="grid-area: up;" id="up">↑</button>
+            <button style="grid-area: left;" id="left">←</button>
+            <button style="grid-area: right;" id="right">→</button>
+            <button style="grid-area: down;" id="down">↓</button>
+        </div>
+    </div>
+</body>
+
+</html>

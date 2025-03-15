@@ -1,75 +1,78 @@
-from flask import Blueprint, render_template, Response, jsonify
-from .video_stream import video_stream
-from .sensor_interface import sensor_interface
-from .object_detection.detector import object_detector
+from flask import Blueprint, render_template, Response, send_file, jsonify
+import json
+import time
+import os
+from .monitor import SystemMonitor
+from .video_stream import video_stream  # Import the singleton instance
 
-# Create blueprint for all routes
 routes = Blueprint('routes', __name__)
+system_monitor = SystemMonitor()
 
 @routes.route('/')
 def index():
-    """Serve the HTML page with video stream and buttons."""
-    return render_template('index.html')
+    """Render the dashboard page"""
+    return render_template('dashboard.html')
+
+@routes.route('/system-events')
+def system_events():
+    """Server-Sent Events endpoint for system monitoring"""
+    def generate():
+        while True:
+            # Get current stats
+            stats = system_monitor.get_minimal_stats()
+            if stats:
+                yield f"data: {json.dumps(stats)}\n\n"
+            time.sleep(1)  # Update every second
+    
+    return Response(generate(), mimetype='text/event-stream')
+
+@routes.route('/api/system-stats')
+def get_system_stats():
+    """Get full system statistics including history"""
+    return json.dumps(system_monitor.get_stats())
 
 @routes.route('/video_feed')
 def video_feed():
-    """Route for streaming the video feed."""
-    return Response(
-        video_stream.generate_frames(),
-        mimetype='multipart/x-mixed-replace; boundary=frame'
-    )
+    """Video streaming route with error handling"""
+    global video_stream
+    
+    try:
+        if not video_stream:
+            video_stream = VideoStream()
+        
+        return Response(
+            video_stream.generate_frames(),
+            mimetype='multipart/x-mixed-replace; boundary=frame'
+        )
+    except Exception as e:
+        # Log the error
+        print(f"Error in video feed: {e}")
+        # Return a simple response with black background
+        html = '''
+        <html>
+            <body style="margin:0;padding:0;background:#000;height:100%;width:100%;display:flex;align-items:center;justify-content:center;">
+                <div style="color:#ffdb15;font-family:monospace;text-align:center;">
+                    <div style="font-size:24px;margin-bottom:10px;">📷</div>
+                    <div>No Camera Feed</div>
+                </div>
+            </body>
+        </html>
+        '''
+        return Response(html, mimetype='text/html')
 
-@routes.route('/toggle_stream', methods=['POST'])
-def toggle_stream():
-    """Toggle video streaming on/off."""
-    is_streaming = video_stream.toggle_stream()
-    return jsonify({"streaming": is_streaming})
-
-@routes.route('/action', methods=['GET'])
-def action():
-    """Custom Raspberry Pi action."""
-    print("Button clicked! Performing Raspberry Pi action...")
-    # Example: Run a script, turn on LED, etc.
-    return jsonify({"message": "Action executed on Raspberry Pi!"})
-
-# New routes for sensor data and object detection
-@routes.route('/sensor/start', methods=['POST'])
-def start_sensor():
-    """Start sensor data collection."""
-    sensor_interface.start_collection()
-    return jsonify({"status": "Sensor collection started"})
-
-@routes.route('/sensor/stop', methods=['POST'])
-def stop_sensor():
-    """Stop sensor data collection."""
-    sensor_interface.stop_collection()
-    return jsonify({"status": "Sensor collection stopped"})
-
-@routes.route('/sensor/data', methods=['GET'])
-def get_sensor_data():
-    """Get latest sensor data."""
-    data = sensor_interface.get_latest_data()
-    return jsonify(data)
-
-@routes.route('/sensor/batch', methods=['GET'])
-def get_sensor_batch():
-    """Get batch of sensor readings."""
-    batch = sensor_interface.get_data_batch()
-    return jsonify({"data": batch})
-
-@routes.route('/detection/status', methods=['GET'])
-def get_detection_status():
-    """Get object detection status."""
-    return jsonify({
-        "initialized": object_detector.is_initialized,
-        "classes": object_detector.classes
-    })
-
-# Error handlers
-@routes.errorhandler(404)
-def not_found_error(error):
-    return jsonify({"error": "Not found"}), 404
-
-@routes.errorhandler(500)
-def internal_error(error):
-    return jsonify({"error": "Internal server error"}), 500
+@routes.route('/video/toggle', methods=['POST'])
+def toggle_video():
+    """Toggle video stream on/off"""
+    try:
+        is_streaming = video_stream.toggle_stream()
+        return jsonify({
+            'status': 'success',
+            'streaming': is_streaming,
+            'message': 'Video stream toggled successfully'
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'streaming': False,
+            'message': str(e)
+        }), 503
