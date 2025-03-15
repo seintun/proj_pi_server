@@ -3,7 +3,14 @@ from typing import Generator, Tuple, Optional
 
 class VideoStream:
     def __init__(self):
-        self.camera = cv2.VideoCapture(0)  # Change to 1 if using external USB camera
+        # Try both USB and Pi Camera devices
+        self.camera = None
+        for device in [0, 1]:
+            self.camera = cv2.VideoCapture(device)
+            if self.camera.isOpened():
+                break
+        if not self.camera or not self.camera.isOpened():
+            raise RuntimeError("Could not open video device")
         self.is_streaming = True
 
     def get_frame(self) -> Tuple[bool, Optional[bytes]]:
