@@ -17,22 +17,27 @@
         <div class="system-stats">
             <div class="stat-group">
                 <h3>CPU Information</h3>
-                <ul class="stat-list">
-                    <li>Usage: <span id="cpuUsage" class="stat-value">--%</span></li>
-                    <li>Temperature: <span id="cpuTemp" class="stat-value">--°C</span></li>
-                    <li>Cores: <span id="cpuCores" class="stat-value">--</span></li>
-                    <li>Threads: <span id="cpuThreads" class="stat-value">--</span></li>
-                    <li>Frequency: <span id="cpuFreq" class="stat-value">-- MHz</span></li>
-                </ul>
+                <div class="cpu-stats">
+                    <div class="cpu-line">
+                        <span id="cpuUsage" class="stat-value">--%</span> @
+                        <span id="cpuTemp" class="stat-value">--°C</span>
+                    </div>
+                    <div class="cpu-line">
+                        <span id="cpuCores" class="stat-value">--</span>Cores/<span id="cpuThreads"
+                            class="stat-value">--</span>Threads @
+                        <span id="cpuFreq" class="stat-value">-- MHz</span>
+                    </div>
+                </div>
             </div>
             <div class="stat-group">
                 <h3>Memory Information</h3>
-                <ul class="stat-list">
-                    <li>Usage: <span id="ramUsage" class="stat-value">--%</span></li>
-                    <li>Total: <span id="memTotal" class="stat-value">-- MB</span></li>
-                    <li>Used: <span id="memUsed" class="stat-value">-- MB</span></li>
-                    <li>Free: <span id="memFree" class="stat-value">-- MB</span></li>
-                </ul>
+                <div class="memory-line">
+                    <span class="memory-stat">
+                        <span id="memUsed" class="stat-value">-- GB</span> / <span id="memTotal" class="stat-value">--
+                            GB</span>
+                        (<span id="ramUsage" class="stat-value">--%</span>)
+                    </span>
+                </div>
             </div>
         </div>
         <h2>Sensor Feedback</h2>

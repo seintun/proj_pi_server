@@ -122,6 +122,65 @@ body {
     margin-left: 10px;
 }
 
+.memory-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.memory-stat {
+    font-size: 1.1em;
+    letter-spacing: 0.5px;
+}
+
+.memory-stat .stat-value {
+    margin: 0 2px;
+}
+
+.cpu-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.cpu-line {
+    font-size: 1.1em;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cpu-line .stat-value {
+    margin: 0;
+}
+
+/* Add color indicators for temperature */
+#cpuTemp.critical {
+    color: #ff4444;
+    text-shadow: 0 0 5px #ff4444;
+}
+
+#cpuTemp:not(.critical) {
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+/* Usage color indicators */
+#cpuUsage {
+    color: #ffdb15;
+    text-shadow: 0 0 5px #ffdb15;
+}
+
 /* Video Feed */
 .video-feed {
     width: 100%;

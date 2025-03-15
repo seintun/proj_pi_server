@@ -163,11 +163,19 @@ class DashboardUI {
         this.pendingUpdates.set('cpuThreads', data.cpu.threads);
         this.pendingUpdates.set('cpuFreq', `${data.cpu.frequency} MHz`);
 
-        // Queue Memory updates with formatted values
-        this.pendingUpdates.set('ramUsage', `${data.memory.percent || 0}%`);
-        this.pendingUpdates.set('memTotal', data.memory.total_formatted || '0 MB');
-        this.pendingUpdates.set('memUsed', data.memory.used_formatted || '0 MB');
-        this.pendingUpdates.set('memFree', data.memory.free_formatted || '0 MB');
+        // Queue Memory updates with formatted values and validation
+        const memPercent = data.memory?.percent ?? 0;
+        const memTotal = data.memory?.total_formatted ?? '0 MB';
+        const memUsed = data.memory?.used_formatted ?? '0 MB';
+        const memFree = data.memory?.free_formatted ?? '0 MB';
+
+        this.pendingUpdates.set('ramUsage', `${memPercent}%`);
+        this.pendingUpdates.set('memTotal', memTotal);
+        this.pendingUpdates.set('memUsed', memUsed);
+        this.pendingUpdates.set('memFree', memFree);
+
+        // Update RAM chart with validated percentage
+        this.updateChart(this.charts.ram, memPercent, new Date().toLocaleTimeString());
 
         // Check for critical temperature (with default value)
         const tempElement = document.getElementById('cpuTemp');
@@ -204,8 +212,6 @@ class DashboardUI {
         // Update CPU chart
         this.updateChart(this.charts.cpu, data.cpu.usage, timestamp);
 
-        // Update RAM chart
-        this.updateChart(this.charts.ram, data.memory.percent, timestamp);
 
         // Update Temperature chart
         this.updateChart(this.charts.temp, data.temperature, timestamp);

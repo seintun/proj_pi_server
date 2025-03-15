@@ -46,12 +46,15 @@ class SystemMonitor:
         cpu_info = get_cpu_info()
         cpu_info['usage'] = self.cpu.get_usage()
         
-        # Get memory information
+        # Get memory information with percentage
         memory_info = get_memory_info()
+        memory_usage = self.memory.get_usage()  # Get current usage percentage
+        
         # Convert to human readable format
         memory_info['total_formatted'] = format_memory_size(memory_info['total'])
         memory_info['used_formatted'] = format_memory_size(memory_info['used'])
         memory_info['free_formatted'] = format_memory_size(memory_info['free'])
+        memory_info['percent'] = memory_usage  # Ensure percentage is included
         
         return {
             'cpu': cpu_info,
