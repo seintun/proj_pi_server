@@ -59,13 +59,23 @@ class VideoController {
     }
 
     updateUI() {
+        const cameraStatusIcon = document.getElementById('camera-status-icon');
+        
+        if (cameraStatusIcon) {
+            cameraStatusIcon.style.display = this.isStreaming ? 'block' : 'none';
+        }
+
         if (this.statusIcon) {
             this.statusIcon.classList.toggle('off', !this.isStreaming);
         }
         if (this.statusText) {
             this.statusText.textContent = this.isStreaming ? 'Stop Stream' : 'Start Stream';
         }
-        this.toggleBtn.classList.remove('error');
+        
+        if (this.toggleBtn) {
+            this.toggleBtn.classList.toggle('streaming', this.isStreaming);
+            this.toggleBtn.classList.remove('error');
+        }
     }
 
     handleVideoError() {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script src="{{ url_for('static', filename='js/video-control.js') }}"></script>
 </head>
+
 <body>
     <div class="container" id="system-stats">
         <h2>System Stats</h2>
@@ -43,10 +45,13 @@
     <div class="container" id="camera-feed">
         <h2>Camera Feed</h2>
         <div class="video-feed">
+            <div class="camera-status">
+                <div id="camera-status-icon" class="camera-status-icon"></div>
+            </div>
             <img src="{{ url_for('routes.video_feed') }}" alt="Camera Feed">
             <div class="video-controls">
                 <button class="video-toggle-btn">
-                    <span class="status-icon">⚫</span>
+                    <span class="status-icon">🔴</span>
                     <span class="status-text">Stop Stream</span>
                 </button>
             </div>
@@ -97,4 +102,5 @@
         </div>
     </div>
 </body>
+
 </html>
