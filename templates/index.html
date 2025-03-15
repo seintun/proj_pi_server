@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry Pi Video Stream</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        #video-container {
+            margin: 20px auto;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 10px;
+        }
+    </style>
+    <script>
+        function toggleStream() {
+            fetch('/toggle_stream', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('video').src = data.streaming ? "/video_feed" : "";
+                });
+        }
+
+        function performAction() {
+            fetch('/action')
+                .then(response => response.json())
+                .then(data => alert(data.message));
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Raspberry Pi Live Stream</h1>
+    <div id="video-container">
+        <img id="video" src="/video_feed" width="640" height="480" />
+    </div>
+    <button onclick="toggleStream()">Toggle Video Stream</button>
+    <button onclick="performAction()">Perform Action</button>
+</body>
+
+</html>
