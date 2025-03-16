@@ -6,8 +6,17 @@ class VideoController {
         this.statusIcon = document.querySelector('.status-icon');
         this.statusText = document.querySelector('.status-text');
         this.cameraTypeIndicator = document.querySelector('.camera-type-indicator');
+        
+        // Video metrics elements
+        this.resolutionElement = document.getElementById('resolution');
+        this.bitrateElement = document.getElementById('bitrate');
+        this.fpsElement = document.getElementById('video-fps');
+        this.qualityElement = document.getElementById('quality');
+        
+        this.lastStatUpdate = 0;
+        this.statUpdateInterval = 1000; // Update stats every second
+        
         this.setupControls();
-        this.updateCameraType();
     }
 
     setupControls() {
@@ -21,28 +30,65 @@ class VideoController {
                 this.handleVideoError();
             });
         }
-
-        // Update camera type periodically
-        setInterval(() => this.updateCameraType(), 5000);
+        
+        // Initial stats update
+        this.updateStats();
+        
+        // Update stats periodically
+        setInterval(() => {
+            if (this.isStreaming) {
+                this.updateStats();
+            }
+        }, this.statUpdateInterval);
     }
 
-    async updateCameraType() {
+    async updateStats() {
         try {
-            const response = await fetch('/video/camera-type');
+            const now = Date.now();
+            if (now - this.lastStatUpdate < this.statUpdateInterval) {
+                return; // Prevent too frequent updates
+            }
+            this.lastStatUpdate = now;
+
+            const response = await fetch('/video/stats');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            if (data.status === 'success' && this.cameraTypeIndicator) {
-                this.cameraTypeIndicator.textContent = data.display_name;
+            if (data.status === 'success') {
+                const stats = data.stats;
+                
+                // Update metrics display
+                if (this.resolutionElement) {
+                    this.resolutionElement.textContent = stats.resolution;
+                }
+                if (this.bitrateElement) {
+                    this.bitrateElement.textContent = `${stats.bitrate.toFixed(1)} kbps`;
+                }
+                if (this.fpsElement) {
+                    this.fpsElement.textContent = stats.fps.toFixed(1);
+                }
+                if (this.qualityElement) {
+                    this.qualityElement.textContent = `${stats.quality}%`;
+                }
+                
+                // Update camera type with basic info
+                if (this.cameraTypeIndicator) {
+                    this.cameraTypeIndicator.textContent = stats.display_name;
+                }
             }
         } catch (error) {
-            console.error('Error updating camera type:', error);
-            if (this.cameraTypeIndicator) {
-                this.cameraTypeIndicator.textContent = 'Camera Error';
-            }
+            console.error('Error updating video stats:', error);
+            this.resetMetrics();
         }
+    }
+
+    resetMetrics() {
+        if (this.resolutionElement) this.resolutionElement.textContent = '--x--';
+        if (this.bitrateElement) this.bitrateElement.textContent = '-- kbps';
+        if (this.fpsElement) this.fpsElement.textContent = '--';
+        if (this.qualityElement) this.qualityElement.textContent = '--%';
     }
 
     async toggleStream() {
@@ -104,6 +150,7 @@ class VideoController {
         // Update video source based on streaming state
         if (!this.isStreaming) {
             this.feedImage.src = '/static/img/no-camera.png';
+            this.resetMetrics();
         }
     }
 

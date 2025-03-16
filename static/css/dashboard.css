@@ -242,6 +242,37 @@ body {
     50% { opacity: 0; }
 }
 
+.video-metrics {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    background: rgba(30, 30, 30, 0.8);
+    border: 1px solid #ffdb15;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.metric {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #ffdb15;
+}
+
+.metric-label {
+    opacity: 0.8;
+}
+
+.metric-value {
+    font-weight: bold;
+    text-shadow: 0 0 5px #ffdb15;
+}
+
 .video-controls {
     position: absolute;
     bottom: 10px;
