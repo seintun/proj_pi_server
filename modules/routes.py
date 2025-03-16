@@ -47,18 +47,8 @@ def video_feed():
     except Exception as e:
         # Log the error
         print(f"Error in video feed: {e}")
-        # Return a simple response with black background
-        html = '''
-        <html>
-            <body style="margin:0;padding:0;background:#000;height:100%;width:100%;display:flex;align-items:center;justify-content:center;">
-                <div style="color:#ffdb15;font-family:monospace;text-align:center;">
-                    <div style="font-size:24px;margin-bottom:10px;">📷</div>
-                    <div>No Camera Feed</div>
-                </div>
-            </body>
-        </html>
-        '''
-        return Response(html, mimetype='text/html')
+        # Return no-camera image
+        return send_file('static/img/no-camera.png', mimetype='image/png')
 
 @routes.route('/video/camera-type')
 def get_camera_type():

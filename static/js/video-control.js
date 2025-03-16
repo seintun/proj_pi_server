@@ -100,6 +100,11 @@ class VideoController {
             this.toggleBtn.classList.toggle('streaming', this.isStreaming);
             this.toggleBtn.classList.remove('error');
         }
+
+        // Update video source based on streaming state
+        if (!this.isStreaming) {
+            this.feedImage.src = '/static/img/no-camera.png';
+        }
     }
 
     handleVideoError() {

@@ -34,32 +34,42 @@ class VideoStream:
 
     def get_frame(self) -> Tuple[bool, Optional[bytes]]:
         """Capture and encode a single frame."""
-        if not self.camera:
+        if not self.camera or not self.is_streaming:
             return False, None
             
         try:
             if self.camera_type == 'usb':
                 success, frame = self.camera.read()
                 if not success:
+                    print("Failed to read from USB camera")
                     return False, None
             else:  # picam
-                frame = self.camera.capture_array()
+                try:
+                    frame = self.camera.capture_array()
+                except Exception as e:
+                    print(f"Failed to capture from Pi Camera: {str(e)}")
+                    return False, None
             
             # Convert frame to JPEG format
             _, buffer = cv2.imencode('.jpg', frame)
             return True, buffer.tobytes()
-        except Exception:
+        except Exception as e:
+            print(f"Error capturing frame: {str(e)}")
             return False, None
 
     def generate_frames(self) -> Generator[bytes, None, None]:
         """Generate frames for streaming."""
-        while self.is_streaming:
-            success, frame_bytes = self.get_frame()
-            if not success:
-                break
-            
-            yield (b'--frame\r\n'
-                  b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        try:
+            while self.is_streaming:
+                success, frame_bytes = self.get_frame()
+                if not success:
+                    print("No frame available, stopping stream")
+                    break
+                
+                yield (b'--frame\r\n'
+                      b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        except Exception as e:
+            print(f"Error in generate_frames: {str(e)}")
 
     def toggle_stream(self) -> bool:
         """Toggle streaming state."""
