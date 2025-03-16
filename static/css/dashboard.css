@@ -182,6 +182,27 @@ body {
 }
 
 /* Video Feed */
+.camera-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.camera-header h2 {
+    margin: 0;
+}
+
+.camera-type-indicator {
+    background: rgba(30, 30, 30, 0.8);
+    border: 1px solid #ffdb15;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
+    color: #ffdb15;
+}
+
 .video-feed {
     width: 100%;
     height: 100%;
@@ -195,8 +216,9 @@ body {
 .video-feed img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 8px;
+    background-color: #000;
 }
 
 .camera-status {
@@ -218,6 +240,37 @@ body {
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
+}
+
+.video-metrics {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    background: rgba(30, 30, 30, 0.8);
+    border: 1px solid #ffdb15;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.metric {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #ffdb15;
+}
+
+.metric-label {
+    opacity: 0.8;
+}
+
+.metric-value {
+    font-weight: bold;
+    text-shadow: 0 0 5px #ffdb15;
 }
 
 .video-controls {

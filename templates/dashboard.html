@@ -48,12 +48,33 @@
     </div>
 
     <div class="container" id="camera-feed">
-        <h2>Camera Feed</h2>
+        <div class="camera-header">
+            <h2>Camera Feed</h2>
+            <span class="camera-type-indicator">Loading...</span>
+        </div>
         <div class="video-feed">
             <div class="camera-status">
                 <div id="camera-status-icon" class="camera-status-icon"></div>
             </div>
             <img src="{{ url_for('routes.video_feed') }}" alt="Camera Feed">
+            <div class="video-metrics">
+                <div class="metric">
+                    <span class="metric-label">Resolution:</span>
+                    <span class="metric-value" id="resolution">--x--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Bitrate:</span>
+                    <span class="metric-value" id="bitrate">-- kbps</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">FPS:</span>
+                    <span class="metric-value" id="video-fps">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Quality:</span>
+                    <span class="metric-value" id="quality">--%</span>
+                </div>
+            </div>
             <div class="video-controls">
                 <button class="video-toggle-btn">
                     <span class="status-icon">🔴</span>

@@ -2,8 +2,13 @@ from flask import Blueprint, render_template, Response, send_file, jsonify
 import json
 import time
 import os
+import logging
 from .monitor import SystemMonitor
 from .video_stream import video_stream  # Import the singleton instance
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 routes = Blueprint('routes', __name__)
 system_monitor = SystemMonitor()
@@ -47,18 +52,55 @@ def video_feed():
     except Exception as e:
         # Log the error
         print(f"Error in video feed: {e}")
-        # Return a simple response with black background
-        html = '''
-        <html>
-            <body style="margin:0;padding:0;background:#000;height:100%;width:100%;display:flex;align-items:center;justify-content:center;">
-                <div style="color:#ffdb15;font-family:monospace;text-align:center;">
-                    <div style="font-size:24px;margin-bottom:10px;">📷</div>
-                    <div>No Camera Feed</div>
-                </div>
-            </body>
-        </html>
-        '''
-        return Response(html, mimetype='text/html')
+        # Return no-camera image
+        return send_file('static/img/no-camera.png', mimetype='image/png')
+
+@routes.route('/video/stats')
+def get_video_stats():
+    """Get video streaming statistics"""
+    try:
+        if not video_stream:
+            raise RuntimeError("Video stream not initialized")
+            
+        stats = video_stream.get_stats()
+        display_name = 'Pi-Cam' if video_stream.camera_type == 'picam' else 'Webcam' if video_stream.camera_type == 'usb' else 'No Camera'
+        
+        # If stream is not active, override some stats
+        if not video_stream.is_streaming:
+            stats.update({
+                'fps': 0,
+                'bitrate': 0,
+                'cpu_usage': 0
+            })
+        
+        return jsonify({
+            'status': 'success',
+            'stats': {
+                **stats,
+                'display_name': display_name
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error getting video stats: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 503
+
+@routes.route('/video/camera-type')
+def get_camera_type():
+    """Get current camera type"""
+    try:
+        return jsonify({
+            'status': 'success',
+            'type': video_stream.camera_type or 'none',
+            'display_name': 'Pi-Cam' if video_stream.camera_type == 'picam' else 'Webcam' if video_stream.camera_type == 'usb' else 'No Camera'
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 503
 
 @routes.route('/video/toggle', methods=['POST'])
 def toggle_video():
