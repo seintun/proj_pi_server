@@ -5,10 +5,11 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
 ## ✨ Features
 
 - 📹 **Live Video Streaming**: Real-time camera feed with controls
-  - Automatic camera detection
+  - Automatic camera detection (Pi Camera Module and USB cameras)
   - Quality/resolution controls
   - Stream performance optimization
   - Error handling with fallback display
+  - Video recording capability
 
 - 📊 **System Monitoring**: 
   - CPU usage and temperature tracking
@@ -43,10 +44,17 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
 
 2. **Install Dependencies**
 
+   First, install required system packages:
+   ```bash
+   # Install picamera2 for Raspberry Pi camera support
+   sudo apt install -y python3-picamera2
+   ```
+
+   Then install Python packages:
    ```bash
    pip install --no-cache-dir -r requirements.txt
    ```
-    Note: `--no-cache-dir`: Prevents caching of downloaded packages to save space on low-memory systems like Raspberry Pi.
+   Note: `--no-cache-dir`: Prevents caching of downloaded packages to save space on low-memory systems like Raspberry Pi.
 
 3. **Start Server**
    ```bash
@@ -143,13 +151,16 @@ docker compose build --no-cache
 
 - Raspberry Pi (3/4/Zero 2W)
 - Python 3.7+
-- USB Camera or Pi Camera
+- USB Camera or Pi Camera Module
+  - For Pi Camera: requires python3-picamera2 package (install via apt)
+  - For USB Camera: automatically supported via OpenCV
 - Internet connection for initial setup
 
 ## 📦 Key Dependencies
 
 - Flask 3.0.0: Web framework
 - OpenCV 4.8.1: Video processing
+- picamera2: Raspberry Pi camera interface (system package)
 - psutil 5.9.5: System monitoring
 - NumPy 1.24.3: Data processing
 - Werkzeug 3.0.1: WSGI utilities
