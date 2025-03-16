@@ -182,6 +182,27 @@ body {
 }
 
 /* Video Feed */
+.camera-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.camera-header h2 {
+    margin: 0;
+}
+
+.camera-type-indicator {
+    background: rgba(30, 30, 30, 0.8);
+    border: 1px solid #ffdb15;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
+    color: #ffdb15;
+}
+
 .video-feed {
     width: 100%;
     height: 100%;

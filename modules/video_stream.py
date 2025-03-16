@@ -3,25 +3,53 @@ from typing import Generator, Tuple, Optional
 
 class VideoStream:
     def __init__(self):
-        # Try both USB and Pi Camera devices
         self.camera = None
+        self.camera_type = None
+        self.is_streaming = True
+        self.init_camera()
+
+    def init_camera(self):
+        """Initialize camera with Pi Camera priority, fallback to USB."""
+        # Try Pi Camera first
+        try:
+            from picamera2 import Picamera2
+            self.camera = Picamera2()
+            self.camera.start()
+            self.camera_type = 'picam'
+            print("Initialized Pi Camera successfully")
+            return
+        except (ImportError, Exception) as e:
+            print(f"Pi Camera initialization failed: {str(e)}, trying USB camera")
+            pass
+
+        # Fallback to USB camera
         for device in [0, 1]:
             self.camera = cv2.VideoCapture(device)
             if self.camera.isOpened():
-                break
-        if not self.camera or not self.camera.isOpened():
-            raise RuntimeError("Could not open video device")
-        self.is_streaming = True
+                self.camera_type = 'usb'
+                print("Initialized USB Camera successfully")
+                return
+
+        raise RuntimeError("No camera available (tried Pi Camera and USB)")
 
     def get_frame(self) -> Tuple[bool, Optional[bytes]]:
         """Capture and encode a single frame."""
-        success, frame = self.camera.read()
-        if not success:
+        if not self.camera:
             return False, None
-        
-        # Convert frame to JPEG format
-        _, buffer = cv2.imencode('.jpg', frame)
-        return True, buffer.tobytes()
+            
+        try:
+            if self.camera_type == 'usb':
+                success, frame = self.camera.read()
+                if not success:
+                    return False, None
+            else:  # picam
+                frame = self.camera.capture_array()
+            
+            # Convert frame to JPEG format
+            _, buffer = cv2.imencode('.jpg', frame)
+            return True, buffer.tobytes()
+        except Exception:
+            return False, None
 
     def generate_frames(self) -> Generator[bytes, None, None]:
         """Generate frames for streaming."""
@@ -40,7 +68,11 @@ class VideoStream:
 
     def __del__(self):
         """Release camera resources."""
-        self.camera.release()
+        if self.camera:
+            if self.camera_type == 'usb':
+                self.camera.release()
+            else:  # picam
+                self.camera.close()
 
 # Create a single instance to be used across the application
 video_stream = VideoStream()

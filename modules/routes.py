@@ -60,6 +60,21 @@ def video_feed():
         '''
         return Response(html, mimetype='text/html')
 
+@routes.route('/video/camera-type')
+def get_camera_type():
+    """Get current camera type"""
+    try:
+        return jsonify({
+            'status': 'success',
+            'type': video_stream.camera_type or 'none',
+            'display_name': 'Pi-Cam' if video_stream.camera_type == 'picam' else 'Webcam' if video_stream.camera_type == 'usb' else 'No Camera'
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 503
+
 @routes.route('/video/toggle', methods=['POST'])
 def toggle_video():
     """Toggle video stream on/off"""

@@ -5,7 +5,9 @@ class VideoController {
         this.toggleBtn = document.querySelector('.video-toggle-btn');
         this.statusIcon = document.querySelector('.status-icon');
         this.statusText = document.querySelector('.status-text');
+        this.cameraTypeIndicator = document.querySelector('.camera-type-indicator');
         this.setupControls();
+        this.updateCameraType();
     }
 
     setupControls() {
@@ -18,6 +20,28 @@ class VideoController {
             this.feedImage.addEventListener('error', () => {
                 this.handleVideoError();
             });
+        }
+
+        // Update camera type periodically
+        setInterval(() => this.updateCameraType(), 5000);
+    }
+
+    async updateCameraType() {
+        try {
+            const response = await fetch('/video/camera-type');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.status === 'success' && this.cameraTypeIndicator) {
+                this.cameraTypeIndicator.textContent = data.display_name;
+            }
+        } catch (error) {
+            console.error('Error updating camera type:', error);
+            if (this.cameraTypeIndicator) {
+                this.cameraTypeIndicator.textContent = 'Camera Error';
+            }
         }
     }
 
