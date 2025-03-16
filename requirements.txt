@@ -1,3 +1,7 @@
+# System Packages (install via apt):
+# sudo apt install -y python3-picamera2  # Required for Raspberry Pi camera support
+
+# Python Packages (install via pip):
 Flask==3.0.0
 psutil==5.9.5
 Werkzeug==3.0.1
