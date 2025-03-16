@@ -43,6 +43,8 @@ class VideoStream:
                 if not success:
                     print("Failed to read from USB camera")
                     return False, None
+                # Flip horizontal for USB camera
+                frame = cv2.flip(frame, 1)
             else:  # picam
                 try:
                     frame = self.camera.capture_array()
@@ -50,8 +52,8 @@ class VideoStream:
                     print(f"Failed to capture from Pi Camera: {str(e)}")
                     return False, None
             
-            # Convert frame to JPEG format
-            _, buffer = cv2.imencode('.jpg', frame)
+            # Convert frame to JPEG format at full resolution
+            _, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
             return True, buffer.tobytes()
         except Exception as e:
             print(f"Error capturing frame: {str(e)}")
