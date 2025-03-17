@@ -24,7 +24,7 @@ class DashboardUI {
                         color: 'rgba(255, 219, 21, 0.1)',
                         drawBorder: false
                     },
-                    ticks: { 
+                    ticks: {
                         color: '#ffdb15',
                         font: {
                             family: 'Roboto Mono'
@@ -140,7 +140,7 @@ class DashboardUI {
 
     setupEventSource() {
         const eventSource = new EventSource('/system-events');
-        
+
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
             this.updateStats(data);
@@ -180,7 +180,7 @@ class DashboardUI {
         // Check for critical temperature (with default value)
         const tempElement = document.getElementById('cpuTemp');
         const temp = data.temperature ?? 0;
-        
+
         if (tempElement) {
             if (temp > 80) {
                 tempElement.classList.add('critical');

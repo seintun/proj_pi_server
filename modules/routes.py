@@ -36,6 +36,11 @@ def get_system_stats():
     """Get full system statistics including history"""
     return json.dumps(system_monitor.get_stats())
 
+@routes.route('/api/ultrasoinc')
+def get_system_stats():
+    """Get full system statistics including history"""
+    return json.dumps(sonic.get_stats())
+
 @routes.route('/video_feed')
 def video_feed():
     """Video streaming route with error handling"""
