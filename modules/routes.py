@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, Response, send_file, jsonify
+from flask import Blueprint, render_template, Response, send_file, jsonify, request
 import json
 import time
 import os
 import logging
 from .monitor import SystemMonitor
 from .video_stream import video_stream  # Import the singleton instance
+from .gpio import gpio_controller
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -82,6 +83,22 @@ def get_video_stats():
         })
     except Exception as e:
         logger.error(f"Error getting video stats: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 503
+        
+@routes.route('/api/gpio/led/toggle', methods=['POST'])
+def toggle_led():
+    """Toggle LED state"""
+    try:
+        new_state = gpio_controller.toggle_led()
+        return jsonify({
+            'status': 'success',
+            'state': new_state
+        })
+    except Exception as e:
+        logger.error(f"Error toggling LED: {e}")
         return jsonify({
             'status': 'error',
             'message': str(e)

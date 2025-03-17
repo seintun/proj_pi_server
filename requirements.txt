@@ -3,6 +3,7 @@
 
 # Python Packages (install via pip):
 Flask==3.0.0
+RPi.GPIO==0.7.1  # For GPIO control
 psutil==5.9.5
 Werkzeug==3.0.1
 opencv-python-headless==4.8.1.78  # Lightweight version without GUI dependencies
