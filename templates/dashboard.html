@@ -9,6 +9,7 @@
     <script src="{{ url_for('static', filename='vendor/chart.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script src="{{ url_for('static', filename='js/video-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/gpio-control.js') }}"></script>
 </head>
 
 <body>
@@ -84,8 +85,10 @@
         </div>
     </div>
 
+
     <div class="container" id="toggle-mode">
         <button id="toggleMode">AI Mode</button>
+        <button id="gpioButton" class="gpio-btn">Toggle LED</button>
     </div>
 
     <div class="charts-container">
@@ -102,7 +105,6 @@
             <canvas id="tempChart"></canvas>
         </div>
     </div>
-
     <div class="container" id="arm-gripper">
         <div class="arm-gripper">
             <button style="grid-area: ul;" id="raiseArm">Raise Arm</button>

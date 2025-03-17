@@ -34,7 +34,7 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
   - System resource monitoring
   - Temperature tracking
 
-## 🚀 Quick Start
+## 🚀 Quick Set-Up for the first time
 
 1. **Setup Environment**
    ```bash
@@ -50,7 +50,7 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
    sudo apt install -y python3-picamera2
    ```
 
-   Then install Python packages:
+   Then install Python packages: (Run this again if you installed new packages)
    ```bash
    pip install --no-cache-dir -r requirements.txt
    ```
@@ -64,6 +64,23 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
 4. **Access Dashboard**
    - Open `http://<raspberry_pi_ip>:5000`
    - Default port: 5000
+
+## On-going Development
+
+### Development Mode
+```bash
+  # Start with hot-reload
+  python app.py
+```
+
+### Restarting the Server after changes
+```bash
+  # Stop the server
+  CTRL+C
+
+  # Start the server again
+  python app.py
+```
 
 ## 🐳 Docker (Optional)
 
