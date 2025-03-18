@@ -28,3 +28,5 @@ db.sqlite3
 # Ignore Raspberry Pi-specific logs and cache
 *.nvcache/
 
+# Ignore camera test files
+camera_tests/test_files/

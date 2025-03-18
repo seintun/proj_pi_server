@@ -1,172 +1,175 @@
 import cv2
 import time
 import psutil
-from typing import Generator, Tuple, Optional, Dict
-from threading import Lock
-import numpy as np
 import logging
+import threading
+import queue
+import numpy as np
+from typing import Generator, Tuple, Optional, Dict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class VideoStream:
-    def __init__(self):
+    def __init__(self, target_fps: int = 30, jpeg_quality: int = 80, queue_size: int = 5):
         self.camera = None
         self.camera_type = None
         self.is_streaming = True
-        self.lock = Lock()
-        
+        self.lock = threading.Lock()
+        self.frame_queue = queue.Queue(maxsize=queue_size)
+
+        # Capture parameters
+        self.target_fps = target_fps
+        self.jpeg_quality = jpeg_quality
+
         # Metrics tracking
         self.frame_count = 0
-        self.last_frame_time = time.time()
-        self.frame_times = []  # Track last 30 frame times for FPS calculation
-        self.max_frame_times = 30
-        self.current_resolution = (0, 0)
-        self.current_quality = 100
-        self.last_frame_size = 0
-        self.bitrate_window = []  # Track last 10 frame sizes for bitrate calculation
-        self.max_bitrate_samples = 10
-        
+        self.last_metrics_update = time.time()
+        self.fps = 0
+
         self.stats = {
             'fps': 0,
             'resolution': '0x0',
-            'quality': 100,
+            'quality': self.jpeg_quality,
             'bitrate': 0,
             'cpu_usage': 0
         }
-        
+
+        # Initialize the camera and start the capture thread
         self.init_camera()
+        self.capture_thread = threading.Thread(target=self._capture_loop, daemon=True)
+        self.capture_thread.start()
 
     def init_camera(self):
         """Initialize camera with Pi Camera priority, fallback to USB."""
         # Try Pi Camera first
         try:
             from picamera2 import Picamera2
-            self.camera = Picamera2()
-            self.camera.start()
-            self.camera_type = 'picam'
-            logger.info("Initialized Pi Camera successfully")
-            
-            # Get resolution from Pi Camera
-            config = self.camera.camera_config
-            self.current_resolution = (config["main"]["size"][0], config["main"]["size"][1])
-            return
-        except (ImportError, Exception) as e:
-            logger.warning(f"Pi Camera initialization failed: {str(e)}, trying USB camera")
-            pass
+            from libcamera import controls
 
+            logger.info("Attempting to initialize Pi Camera")
+            self.camera = Picamera2()
+
+            if not self.camera.sensor_modes:
+                raise RuntimeError("No Pi Camera detected - check camera connection")
+
+            config = self.camera.create_preview_configuration()
+            self.camera.configure(config)
+            self.camera.start()
+
+            # Calculate µs/frame for target FPS and set controls
+            frame_time = int(1_000_000 / self.target_fps)
+            self.camera.set_controls({
+                "AeEnable": True,
+                "AwbEnable": True,
+                "FrameDurationLimits": (frame_time, frame_time)
+            })
+
+            self.camera_type = 'picam'
+            logger.info("Pi Camera initialized successfully with configuration: %s", config)
+            logger.info("Available sensor modes: %s", self.camera.sensor_modes)
+            self.stats['resolution'] = f'{config["main"]["size"][0]}x{config["main"]["size"][1]}'
+            return
+        except Exception as e:
+            logger.error("Pi Camera initialization failed: %s", str(e), exc_info=True)
+            if self.camera and hasattr(self.camera, 'close'):
+                self.camera.close()
+
+        logger.warning("Falling back to USB camera")
         # Fallback to USB camera
         for device in [0, 1]:
-            self.camera = cv2.VideoCapture(device)
-            if self.camera.isOpened():
+            cap = cv2.VideoCapture(device)
+            if cap.isOpened():
+                self.camera = cap
                 self.camera_type = 'usb'
-                
-                # Get resolution from USB camera
                 width = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH))
                 height = int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                self.current_resolution = (width, height)
-                
-                logger.info("Initialized USB Camera successfully")
+                self.stats['resolution'] = f'{width}x{height}'
+                logger.info("Initialized USB Camera successfully on device %s", device)
                 return
 
         raise RuntimeError("No camera available (tried Pi Camera and USB)")
 
-    def update_metrics(self, frame_bytes: bytes):
-        """Update streaming metrics."""
-        current_time = time.time()
-        
-        with self.lock:
-            # Update frame count and timing
-            self.frame_count += 1
-            
-            # Calculate FPS
-            frame_time = current_time - self.last_frame_time
-            self.frame_times.append(frame_time)
-            if len(self.frame_times) > self.max_frame_times:
-                self.frame_times.pop(0)
-            avg_frame_time = np.mean(self.frame_times)
-            current_fps = 1 / avg_frame_time if avg_frame_time > 0 else 0
-            
-            # Calculate bitrate
-            frame_size = len(frame_bytes)
-            self.bitrate_window.append(frame_size)
-            if len(self.bitrate_window) > self.max_bitrate_samples:
-                self.bitrate_window.pop(0)
-            avg_frame_size = np.mean(self.bitrate_window)
-            bitrate = (avg_frame_size * current_fps * 8) / 1024  # kbps
-            
-            # Get CPU usage
-            cpu_usage = psutil.cpu_percent()
-            
-            # Update stats
-            self.stats.update({
-                'fps': round(current_fps, 1),
-                'resolution': f'{self.current_resolution[0]}x{self.current_resolution[1]}',
-                'quality': self.current_quality,
-                'bitrate': round(bitrate, 1),
-                'cpu_usage': round(cpu_usage, 1)
-            })
-            
-            # Log stats periodically (every 30 frames)
-            if self.frame_count % 30 == 0:
-                logger.info(f"Video Stats - FPS: {current_fps:.1f}, Quality: {self.current_quality}%, "
-                          f"Bitrate: {bitrate:.1f} kbps, CPU: {cpu_usage:.1f}%")
-            
-            self.last_frame_time = current_time
-            self.last_frame_size = frame_size
-
-    def get_frame(self) -> Tuple[bool, Optional[bytes]]:
-        """Capture and encode a single frame."""
-        if not self.camera or not self.is_streaming:
-            return False, None
-            
-        try:
-            if self.camera_type == 'usb':
-                success, frame = self.camera.read()
-                if not success:
-                    logger.error("Failed to read from USB camera")
-                    return False, None
-                # Flip horizontal for USB camera
-                frame = cv2.flip(frame, 1)
-            else:  # picam
-                try:
+    def _capture_loop(self):
+        """Continuously capture frames in a separate thread."""
+        encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.jpeg_quality]
+        while self.is_streaming:
+            frame = None
+            try:
+                if self.camera_type == 'usb':
+                    success, frame = self.camera.read()
+                    if not success or frame is None:
+                        logger.error("Failed to read from USB camera")
+                        continue
+                    # Optional: Flip the frame horizontally
+                    frame = cv2.flip(frame, 1)
+                else:  # picam
                     frame = self.camera.capture_array()
-                except Exception as e:
-                    logger.error(f"Failed to capture from Pi Camera: {str(e)}")
-                    return False, None
-            
-            # Convert frame to JPEG format at current quality
-            encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.current_quality]
-            _, buffer = cv2.imencode('.jpg', frame, encode_params)
+            except Exception as e:
+                logger.error("Error capturing frame: %s", str(e))
+                continue
+
+            if frame is None:
+                continue
+
+            # JPEG encode the frame
+            success, buffer = cv2.imencode('.jpg', frame, encode_params)
+            if not success:
+                logger.error("Failed to encode frame")
+                continue
             frame_bytes = buffer.tobytes()
-            
+
             # Update metrics
-            self.update_metrics(frame_bytes)
+            self._update_metrics(len(frame_bytes))
             
-            return True, frame_bytes
-        except Exception as e:
-            logger.error(f"Error capturing frame: {str(e)}")
-            return False, None
+            # Put frame in queue; if full, drop the frame
+            try:
+                self.frame_queue.put(frame_bytes, timeout=0.01)
+            except queue.Full:
+                logger.debug("Frame queue full; dropping frame")
+                continue
+
+            # Sleep to throttle capture rate based on target FPS
+            time.sleep(1 / self.target_fps)
+
+    def _update_metrics(self, frame_size: int):
+        """Update streaming metrics less frequently (e.g., every second)."""
+        with self.lock:
+            self.frame_count += 1
+            now = time.time()
+            elapsed = now - self.last_metrics_update
+            if elapsed >= 1.0:
+                self.fps = self.frame_count / elapsed
+                cpu_usage = psutil.cpu_percent(interval=None)
+                # Bitrate: approximate kbps = (frame_size * fps * 8) / 1024
+                bitrate = (frame_size * self.fps * 8) / 1024
+                self.stats.update({
+                    'fps': round(self.fps, 1),
+                    'quality': self.jpeg_quality,
+                    'bitrate': round(bitrate, 1),
+                    'cpu_usage': round(cpu_usage, 1)
+                })
+                logger.info("Video Stats - FPS: %s, Quality: %s%%, Bitrate: %s kbps, CPU: %s%%",
+                            self.stats['fps'], self.stats['quality'], self.stats['bitrate'], self.stats['cpu_usage'])
+                # Reset metrics counters
+                self.frame_count = 0
+                self.last_metrics_update = now
 
     def generate_frames(self) -> Generator[bytes, None, None]:
-        """Generate frames for streaming."""
-        try:
-            while self.is_streaming:
-                success, frame_bytes = self.get_frame()
-                if not success:
-                    logger.warning("No frame available, stopping stream")
-                    break
-                
+        """Generate frames for streaming from the capture thread queue."""
+        while self.is_streaming:
+            try:
+                frame_bytes = self.frame_queue.get(timeout=1)
                 yield (b'--frame\r\n'
-                      b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-        except Exception as e:
-            logger.error(f"Error in generate_frames: {str(e)}")
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+            except queue.Empty:
+                continue
 
     def toggle_stream(self) -> bool:
         """Toggle streaming state."""
         self.is_streaming = not self.is_streaming
-        logger.info(f"Streaming {'started' if self.is_streaming else 'stopped'}")
+        logger.info("Streaming %s", "started" if self.is_streaming else "stopped")
         return self.is_streaming
 
     def get_stats(self) -> Dict:
@@ -175,13 +178,16 @@ class VideoStream:
             return self.stats.copy()
 
     def __del__(self):
-        """Release camera resources."""
-        if self.camera:
-            if self.camera_type == 'usb':
-                self.camera.release()
-            else:  # picam
-                self.camera.close()
+        if hasattr(self, "camera") and self.camera:
+            try:
+                if self.camera_type == "usb":
+                    self.camera.release()
+                else:
+                    self.camera.close()
+            except Exception:
+                pass
             logger.info("Camera resources released")
 
-# Create a single instance to be used across the application
+
+# Create a singleton instance to be used across the application
 video_stream = VideoStream()
