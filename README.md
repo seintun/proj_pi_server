@@ -38,7 +38,7 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
 
 1. **Setup Environment**
    ```bash
-   python3 -m venv venv
+   python3 -m venv --system-site-packages venv 
    source venv/bin/activate
    ```
 
@@ -46,8 +46,8 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
 
    First, install required system packages:
    ```bash
-   # Install picamera2 for Raspberry Pi camera support
-   sudo apt install -y python3-picamera2
+   # Install necessary Pi Camera packages for Raspberry Pi camera support
+   sudo apt update && sudo apt install -y libcamera-dev python3-libcamera python3-picamera2
    ```
 
    Then install Python packages: (Run this again if you installed new packages)
@@ -55,6 +55,29 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
    pip install --no-cache-dir -r requirements.txt
    ```
    Note: `--no-cache-dir`: Prevents caching of downloaded packages to save space on low-memory systems like Raspberry Pi.
+
+### Optional: Test Pi Camera Functionality
+
+1. **Still Capture**
+   - File: `camera_tests/still_capture.py`
+   - Usage: Captures a single photo saved in `camera_tests/test_files/`
+    ```bash
+    python3 camera_tests/still_capture.py
+    ```
+
+2. **Video Capture**
+   - File: `camera_tests/video_capture.py`
+   - Usage: Records a video saved in `camera_tests/test_files/`
+   ```bash
+   python3 camera_tests/video_capture.py
+    ```
+
+3. **Configuration Test**
+   - File: `camera_tests/configuration_test.py`
+   - Usage: Tests different camera configurations
+   ```bash
+   python3 camera_tests/configuration_test.py
+    ```
 
 3. **Start Server**
    ```bash
