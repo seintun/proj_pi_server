@@ -5,7 +5,7 @@ import os
 import logging
 from .monitor import SystemMonitor
 from .video_stream import video_stream  # Import the singleton instance
-from .gpio import gpio_controller
+from .gpio import motor_controller, servo_arm, servo_gripper, mp3_player
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -87,22 +87,56 @@ def get_video_stats():
             'status': 'error',
             'message': str(e)
         }), 503
-        
-@routes.route('/api/gpio/led/toggle', methods=['POST'])
-def toggle_led():
-    """Toggle LED state"""
-    try:
-        new_state = gpio_controller.toggle_led()
-        return jsonify({
-            'status': 'success',
-            'state': new_state
-        })
-    except Exception as e:
-        logger.error(f"Error toggling LED: {e}")
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        }), 503
+    
+@routes.route('/api/gpio/motor/forward', methods=['POST'])
+def forward():
+    motor_controller.forward()
+    return '', 200
+
+@routes.route('/api/gpio/motor/backward', methods=['POST'])
+def backward():
+    motor_controller.backward()
+    return '', 200
+
+@routes.route('/api/gpio/motor/left', methods=['POST'])
+def left():
+    motor_controller.left()
+    return '', 200
+
+@routes.route('/api/gpio/motor/right', methods=['POST'])
+def right():
+    motor_controller.right()
+    return '', 200
+
+@routes.route('/api/gpio/motor/stop', methods=['POST'])
+def stop():
+    motor_controller.stop()
+    return '', 200
+
+@routes.route('/api/gpio/servo/up', methods=['POST'])
+def up():
+    servo_arm.arm_up()
+    return '', 200
+
+@routes.route('/api/gpio/servo/down', methods=['POST'])
+def down():
+    servo_arm.arm_down()
+    return '', 200
+
+@routes.route('/api/gpio/servo/close', methods=['POST'])
+def close():
+    servo_gripper.close_gripper()
+    return '', 200
+
+@routes.route('/api/gpio/servo/open', methods=['POST'])
+def open():
+    servo_gripper.open_gripper()
+    return '', 200
+
+@routes.route('/api/gpio/player/one', methods=['POST'])
+def play_hello():
+    mp3_player.play_song_one()
+    return '', 200
 
 @routes.route('/video/camera-type')
 def get_camera_type():

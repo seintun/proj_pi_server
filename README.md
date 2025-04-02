@@ -47,7 +47,7 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
    First, install required system packages:
    ```bash
    # Install necessary Pi Camera packages for Raspberry Pi camera support
-   sudo apt update && sudo apt install -y libcamera-dev python3-libcamera python3-picamera2
+   sudo apt update && sudo apt install -y libcamera-dev python3-libcamera python3-picamera2 python3-gpiozero
    ```
 
    Then install Python packages: (Run this again if you installed new packages)
