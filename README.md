@@ -56,6 +56,11 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
    ```
    Note: `--no-cache-dir`: Prevents caching of downloaded packages to save space on low-memory systems like Raspberry Pi.
 
+   If you added new Python packages, run the following commands to ensure they are included in the requirements.txt
+   ```bash
+   pip freeze > requirements.txt
+   ```
+
 ### Optional: Test Pi Camera Functionality
 
 1. **Still Capture**
