@@ -6,6 +6,7 @@ import logging
 from .monitor import SystemMonitor
 from .video_stream import video_stream  # Import the singleton instance
 from .gpio import gpio_controller
+from .sensor_interface import sensor_interface
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -135,3 +136,21 @@ def toggle_video():
             'streaming': False,
             'message': str(e)
         }), 503
+
+# Added by Dillon for Ultrasonic sensor data    
+@routes.route('/sensor-data')
+def sensor_data():
+    """Server-Sent Events endpoint for live sensor data."""
+    def generate():
+        while True:
+            try:
+                # Get the latest sensor data
+                data = sensor_interface.get_latest_data()
+                if data:
+                    yield f"data: {json.dumps(data)}\n\n"
+                time.sleep(0.1)  # Adjust the update frequency as needed
+            except Exception as e:
+                logger.error(f"Error in sensor-data SSE: {e}")
+                yield "data: {}\n\n"
+    return Response(generate(), mimetype='text/event-stream')
+# END Dillon
