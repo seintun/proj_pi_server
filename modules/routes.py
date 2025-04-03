@@ -144,13 +144,12 @@ def sensor_data():
     def generate():
         while True:
             try:
-                # Get the latest sensor data
                 data = sensor_interface.get_latest_data()
                 if data:
                     yield f"data: {json.dumps(data)}\n\n"
-                time.sleep(0.1)  # Adjust the update frequency as needed
+                time.sleep(0.5)  # Stream data every half second
             except Exception as e:
-                logger.error(f"Error in sensor-data SSE: {e}")
+                print(f"Error in sensor-data SSE: {e}")
                 yield "data: {}\n\n"
     return Response(generate(), mimetype='text/event-stream')
 # END Dillon

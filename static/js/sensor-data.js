@@ -15,13 +15,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Update the ultrasonic sensor data
         if (data.ultrasonic) {
-            ultrasonicSensorElement.textContent = `Distance: ${data.ultrasonic.distance} cm (Timestamp: ${new Date(data.ultrasonic.timestamp * 1000).toLocaleTimeString()})`;
+            ultrasonicSensorElement.textContent = `${data.ultrasonic.distance} cm`;
         }
 
         // Update the lidar sensor data
-        // Update lidar sensor data
         if (data.lidar) {
-            lidarSensorElement.textContent = `Distance: ${data.lidar.distance} cm (Timestamp: ${new Date(data.lidar.timestamp * 1000).toLocaleTimeString()})`;
+            lidarSensorElement.textContent = `${data.lidar.distance} cm`;
         }
     };
 
