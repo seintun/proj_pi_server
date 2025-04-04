@@ -133,7 +133,7 @@ def open():
     servo_gripper.open_gripper()
     return '', 200
 
-@routes.route('/api/gpio/player/one', methods=['POST'])
+@routes.route('/api/gpio/player/sayhello', methods=['POST'])
 def play_hello():
     mp3_player.play_song_one()
     return '', 200
