@@ -11,5 +11,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    helloButton?.addEventListener('mousedown', () => sendPlayerCommand('/api/gpio/player/one'));
+    helloButton?.addEventListener('mousedown', () => sendPlayerCommand('/api/gpio/player/sayhello'));
 });
