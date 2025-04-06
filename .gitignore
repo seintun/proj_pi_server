@@ -30,3 +30,6 @@ db.sqlite3
 
 # Ignore camera test files
 camera_tests/test_files/
+
+# vim files
+*.swp

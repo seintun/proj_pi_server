@@ -94,7 +94,9 @@ class VideoStream:
     def _capture_loop(self):
         """Continuously capture frames in a separate thread."""
         encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.jpeg_quality]
-        while self.is_streaming:
+        while True:
+            while not self.is_streaming:
+                continue
             frame = None
             try:
                 if self.camera_type == 'usb':
