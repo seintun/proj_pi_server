@@ -23,7 +23,7 @@ def create_app():
         SEND_FILE_MAX_AGE_DEFAULT=0  # Prevent caching of static files during development
     )
 
-    # Added by Dillon for sensor data collection
+    # For sensor data collection
     @app.before_first_request
     def start_sensor_collection():
         """Start sensor data collection when the app starts."""
@@ -32,7 +32,6 @@ def create_app():
             logger.info("Sensor data collection started successfully.")
         except Exception as e:
             logger.error(f"Failed to start sensor data collection: {e}")
-    # END Dillon
     
     @app.after_request
     def add_header(response):

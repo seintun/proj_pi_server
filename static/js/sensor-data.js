@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const lidarSensorElement = document.getElementById("lidarSensor");
 
     if (!ultrasonicSensorElement || !lidarSensorElement) {
-        console.error("Element with id 'ultrasonicSensor' not found in the DOM.");
+        console.error("Element with id 'ultrasonicSensor' or 'lidarSensor' not found in the DOM.");
         return;
     }
 

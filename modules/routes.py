@@ -136,8 +136,7 @@ def toggle_video():
             'streaming': False,
             'message': str(e)
         }), 503
-
-# Added by Dillon for Ultrasonic sensor data    
+  
 @routes.route('/sensor-data')
 def sensor_data():
     """Server-Sent Events endpoint for live sensor data."""
@@ -147,9 +146,8 @@ def sensor_data():
                 data = sensor_interface.get_latest_data()
                 if data:
                     yield f"data: {json.dumps(data)}\n\n"
-                time.sleep(0.5)  # Stream data every half second
+                time.sleep(0.5)  # Adjust sampling rate as needed
             except Exception as e:
                 print(f"Error in sensor-data SSE: {e}")
                 yield "data: {}\n\n"
     return Response(generate(), mimetype='text/event-stream')
-# END Dillon

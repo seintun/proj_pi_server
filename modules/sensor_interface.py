@@ -78,7 +78,7 @@ class SensorInterface:
 
         # Calculate distance in cm
         pulse_duration = pulse_end - pulse_start
-        distance = pulse_duration * 17150  # Speed of sound: 34300 cm/s divided by 2
+        distance = (pulse_duration * 34300) / 2
         distance = round(distance, 2)
 
         # Cleanup GPIO
@@ -139,8 +139,3 @@ class SensorInterface:
 
 # Create a single instance to be used across the application
 sensor_interface = SensorInterface()
-
-# To test sensor_interface.py separately
-# if __name__ == "__main__":
-#     sensor = SensorInterface()
-#     print(sensor._read_ultrasonic_sensor())
