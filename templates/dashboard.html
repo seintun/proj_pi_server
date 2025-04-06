@@ -9,7 +9,9 @@
     <script src="{{ url_for('static', filename='vendor/chart.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script src="{{ url_for('static', filename='js/video-control.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/gpio-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/motor.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/servo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/player.js') }}"></script>
 </head>
 
 <body>
@@ -89,6 +91,7 @@
     <div class="container" id="toggle-mode">
         <button id="toggleMode">AI Mode</button>
         <button id="gpioButton" class="gpio-btn">Toggle LED</button>
+        <button id="helloButton">Say Hello</button>
     </div>
 
     <div class="charts-container">
@@ -107,10 +110,10 @@
     </div>
     <div class="container" id="arm-gripper">
         <div class="arm-gripper">
-            <button style="grid-area: ul;" id="raiseArm">Raise Arm</button>
-            <button style="grid-area: dl;" id="lowerArm">Lower Arm</button>
-            <button style="grid-area: ur;" id="openGripper">Open Gripper</button>
-            <button style="grid-area: dr;" id="closeGripper">Close Gripper</button>
+            <button style="grid-area: ul;" id="raise_arm_button">Raise Arm</button>
+            <button style="grid-area: dl;" id="lower_arm_button">Lower Arm</button>
+            <button style="grid-area: ur;" id="open_gripper_button">Open Gripper</button>
+            <button style="grid-area: dr;" id="close_gripper_button">Close Gripper</button>
         </div>
     </div>
 
@@ -123,10 +126,10 @@
 
     <div class="container" id="joystick">
         <div class="joystick">
-            <button style="grid-area: up;" id="up">↑</button>
-            <button style="grid-area: left;" id="left">←</button>
-            <button style="grid-area: right;" id="right">→</button>
-            <button style="grid-area: down;" id="down">↓</button>
+            <button style="grid-area: up;" id="forward_button">↑</button>
+            <button style="grid-area: left;" id="left_button">←</button>
+            <button style="grid-area: right;" id="right_button">→</button>
+            <button style="grid-area: down;" id="backward_button">↓</button>
         </div>
     </div>
 </body>
