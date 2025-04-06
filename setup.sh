@@ -34,6 +34,6 @@ sudo apt update && sudo apt install -y \
 	python3-picamera2 \
 	python3-sip
 
-pip3 install -r requirements.txt --no-cache-dir 
 # pip install -r requirements.txt
+pip install -r requirements.txt --no-cache-dir 
 

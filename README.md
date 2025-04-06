@@ -36,6 +36,15 @@ A modern web interface for controlling and monitoring your Raspberry Pi-powered 
 
 ## 🚀 Quick Set-Up for the first time
 
+1. Run the `setup.sh` shell script to install any prerequisite requirements
+   ```bash
+   . setup.sh
+   ```
+
+   - Note the period ^
+
+### Manual Set-Up:
+
 1. **Setup Environment**
    ```bash
    python3 -m venv --system-site-packages venv 
