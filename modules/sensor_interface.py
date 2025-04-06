@@ -1,10 +1,14 @@
-from typing import Dict, Optional, List
+import logging
 import time
+from typing import Dict, Optional, List
 import threading
 from queue import Queue
 import json
 import random
 import RPi.GPIO as GPIO
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 class SensorInterface:
     def __init__(self):
@@ -42,14 +46,13 @@ class SensorInterface:
                         'lidar': lidar_reading
                     })
                 
-                print(f"Ultrasonic Reading: {ultrasonic_reading}")  # Debug log
-                print(f"Lidar Reading: {lidar_reading}")  # Debug log
-                
-                time.sleep(0.5)  # Adjust sampling rate as needed
+                logger.debug(f"Ultrasonic Reading: {ultrasonic_reading}")
+                logger.debug(f"Lidar Reading: {lidar_reading}")
                 
             except Exception as e:
-                print(f"Error collecting sensor data: {e}")
-                time.sleep(0.5)  # Wait before retrying
+                logger.error(f"Error collecting sensor data: {e}")
+                
+            time.sleep(0.5)  # Wait before retrying
 
     def _read_ultrasonic_sensor(self) -> Dict[str, float]:
         """Read data from ultrasonic sensor using GPIO"""
@@ -90,7 +93,8 @@ class SensorInterface:
         }
     
     def _read_lidar_sensor(self) -> Dict[str, float]:
-        """Read dada from lidar sensor""" 
+        """Read data from lidar sensor"""
+        distance = 0.0
         try:
             import smbus
             # Replace with your actual I2C address and setup
@@ -101,23 +105,18 @@ class SensorInterface:
             # You will need to use the appropriate library or commands for your lidar sensor
             # This is a placeholder for actual lidar reading logic
             distance = random.uniform(50.0, 200.0)  # Replace with actual reading logic
-            distance = round(distance, 2)
-
-            return {
-                'distance': distance,
-                'timestamp': time.time()
-            }
         except Exception as e:
-            print(f"Error reading lidar sensor: {e}")
-            return {
-                'distance': 0.0,
-                'timestamp': time.time()
-            }
+            logger.error(f"Error reading lidar sensor: {e}")
+            
+        return {
+            'distance': round(distance, 2),
+            'timestamp': time.time()
+        }
 
     def get_latest_data(self) -> Dict[str, float]:
         # Get the most recent sensor reading
         with self._lock:
-            print(f"Latest sensor data: {self.sensor_data}")  # Debug log
+            logger.debug(f"Latest sensor data: {self.sensor_data}")
             return self.sensor_data.copy()
 
     def get_data_batch(self, batch_size: int = 10) -> List[Dict[str, float]]:
