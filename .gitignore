@@ -33,3 +33,9 @@ camera_tests/test_files/
 
 # vim files
 *.swp
+
+# YOLO model
+yolo11n.pt
+yolo11n.torchscript
+yolo11n_ncnn_model/
+
