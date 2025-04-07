@@ -65,7 +65,7 @@ def get_video_stats():
             raise RuntimeError("Video stream not initialized")
             
         stats = video_stream.get_stats()
-        display_name = 'Pi-Cam' if video_stream.camera_type == 'picam' else 'Webcam' if video_stream.camera_type == 'usb' else 'No Camera'
+        display_name = 'Pi-Cam'
         
         # If stream is not active, override some stats
         if not video_stream.is_streaming:
@@ -112,7 +112,7 @@ def get_camera_type():
         return jsonify({
             'status': 'success',
             'type': video_stream.camera_type or 'none',
-            'display_name': 'Pi-Cam' if video_stream.camera_type == 'picam' else 'Webcam' if video_stream.camera_type == 'usb' else 'No Camera'
+            'display_name': 'Pi-Cam'
         })
     except Exception as e:
         return jsonify({

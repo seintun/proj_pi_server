@@ -6,16 +6,16 @@ class VideoController {
         this.statusIcon = document.querySelector('.status-icon');
         this.statusText = document.querySelector('.status-text');
         this.cameraTypeIndicator = document.querySelector('.camera-type-indicator');
-        
+
         // Video metrics elements
         this.resolutionElement = document.getElementById('resolution');
         this.bitrateElement = document.getElementById('bitrate');
         this.fpsElement = document.getElementById('video-fps');
         this.qualityElement = document.getElementById('quality');
-        
+
         this.lastStatUpdate = 0;
         this.statUpdateInterval = 1000; // Update stats every second
-        
+
         this.setupControls();
     }
 
@@ -30,10 +30,10 @@ class VideoController {
                 this.handleVideoError();
             });
         }
-        
+
         // Initial stats update
         this.updateStats();
-        
+
         // Update stats periodically
         setInterval(() => {
             if (this.isStreaming) {
@@ -57,25 +57,28 @@ class VideoController {
 
             const data = await response.json();
             if (data.status === 'success') {
-                const stats = data.stats;
-                
-                // Update metrics display
+                const stats = data.stats?.stats || {};
+
+                // Update metrics display with fallback values
                 if (this.resolutionElement) {
-                    this.resolutionElement.textContent = stats.resolution;
+                    this.resolutionElement.textContent = stats.resolution || '--x--';
                 }
                 if (this.bitrateElement) {
-                    this.bitrateElement.textContent = `${stats.bitrate.toFixed(1)} kbps`;
+                    const bitrate = stats.bitrate || 0;
+                    this.bitrateElement.textContent = `${bitrate.toFixed(1)} kbps`;
                 }
                 if (this.fpsElement) {
-                    this.fpsElement.textContent = stats.fps.toFixed(1);
+                    const fps = stats.fps || 0;
+                    this.fpsElement.textContent = fps.toFixed(1);
                 }
                 if (this.qualityElement) {
-                    this.qualityElement.textContent = `${stats.quality}%`;
+                    const quality = stats.quality || 0;
+                    this.qualityElement.textContent = `${quality}%`;
                 }
-                
-                // Update camera type with basic info
+
+                // Update camera type indicator
                 if (this.cameraTypeIndicator) {
-                    this.cameraTypeIndicator.textContent = stats.display_name;
+                    this.cameraTypeIndicator.textContent = data.stats.display_name;
                 }
             }
         } catch (error) {
@@ -94,7 +97,7 @@ class VideoController {
     async toggleStream() {
         try {
             this.toggleBtn.disabled = true; // Prevent double-clicks
-            
+
             const response = await fetch('/video/toggle', {
                 method: 'POST',
                 headers: {
@@ -107,11 +110,11 @@ class VideoController {
             }
 
             const data = await response.json();
-            
+
             if (data.status === 'success') {
                 this.isStreaming = data.streaming;
                 this.updateUI();
-                
+
                 // Update video source if streaming is enabled
                 if (this.isStreaming) {
                     // Add timestamp to prevent caching
@@ -130,7 +133,7 @@ class VideoController {
 
     updateUI() {
         const cameraStatusIcon = document.getElementById('camera-status-icon');
-        
+
         if (cameraStatusIcon) {
             cameraStatusIcon.style.display = this.isStreaming ? 'block' : 'none';
         }
@@ -141,7 +144,7 @@ class VideoController {
         if (this.statusText) {
             this.statusText.textContent = this.isStreaming ? 'Stop Stream' : 'Start Stream';
         }
-        
+
         if (this.toggleBtn) {
             this.toggleBtn.classList.toggle('streaming', this.isStreaming);
             this.toggleBtn.classList.remove('error');
@@ -164,7 +167,7 @@ class VideoController {
     showError(message) {
         this.toggleBtn.classList.add('error');
         console.error(message);
-        
+
         // Remove error class after animation completes
         setTimeout(() => {
             this.toggleBtn.classList.remove('error');
