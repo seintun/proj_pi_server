@@ -218,7 +218,8 @@ body {
     height: 100%;
     object-fit: contain;
     border-radius: 8px;
-    background-color: #000;
+    background-color: #000; /* Ensure a neutral background */
+    image-rendering: auto; /* Prevent forced pixelation or color distortion */
 }
 
 .camera-status {
@@ -382,18 +383,25 @@ button:active {
 
 /* Path Display */
 .path-display {
-    width: 100%;
-    height: 100%;
-    background-color: #000;
+    width: 450px; /* Updated width */
+    height: 450px; /* Updated height */
     border: 2px solid #ffdb15;
     border-radius: 10px;
+    background-color: #000;
     overflow: hidden;
+    position: relative;
 }
 
 #pathCanvas {
+    /* Remove conflicting styles */
     width: 100%;
     height: 100%;
     display: block;
+}
+
+#robot-path h2 {
+    margin-top: 5px; /* Move the title closer to the top border */
+    margin-bottom: 10px; /* Adjust spacing below the title */
 }
 
 /* Responsive Design */

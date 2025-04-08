@@ -12,8 +12,8 @@
     <script src="{{ url_for('static', filename='js/motor.js') }}"></script>
     <script src="{{ url_for('static', filename='js/servo.js') }}"></script>
     <script src="{{ url_for('static', filename='js/player.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/gpio-control.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sensor-data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/path.js') }}"></script>
 </head>
 
 <body>
@@ -61,7 +61,7 @@
             <div class="camera-status">
                 <div id="camera-status-icon" class="camera-status-icon"></div>
             </div>
-            <img src="{{ url_for('routes.video_feed') }}" alt="Camera Feed">
+            <img src="{{ url_for('routes.video_feed') }}" alt="Camera Feed" style="image-rendering: auto;">
             <div class="video-metrics">
                 <div class="metric">
                     <span class="metric-label">Resolution:</span>
@@ -92,7 +92,6 @@
 
     <div class="container" id="toggle-mode">
         <button id="toggleMode">AI Mode</button>
-        <button id="gpioButton" class="gpio-btn">Toggle LED</button>
         <button id="helloButton">Say Hello</button>
     </div>
 

@@ -4,8 +4,8 @@ import time
 class MP3Player:
     def __init__(self):
         """Initialize and play the given MP3 file until it ends."""
-        self.running_server = 'mp3/application_running_v2.mp3'
-        self.hello = 'mp3/hello_v2.mp3'
+        self.running_server = 'mp3/application_running_v3.mp3'
+        self.hello = 'mp3/hello_v3.mp3'
 
         pygame.mixer.init()
         self.play_until_end(self.running_server)

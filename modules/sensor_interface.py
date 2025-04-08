@@ -4,8 +4,8 @@ from typing import Dict, Optional, List
 import threading
 from queue import Queue
 import json
-import random
-import RPi.GPIO as GPIO
+from gpiozero import DistanceSensor
+import smbus  # For I2C communication
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -52,40 +52,21 @@ class SensorInterface:
             except Exception as e:
                 logger.error(f"Error collecting sensor data: {e}")
                 
-            time.sleep(0.5)  # Wait before retrying
+            time.sleep(0.4)  # Wait before retrying
 
     def _read_ultrasonic_sensor(self) -> Dict[str, float]:
-        """Read data from ultrasonic sensor using GPIO"""
+        """Read data from ultrasonic sensor using gpiozero"""
         
-        TRIG_PIN = 23  # Replace with your actual TRIG pin number
-        ECHO_PIN = 24  # Replace with your actual ECHO pin number
+        TRIG_PIN = 16  # Replace with your actual TRIG pin number
+        ECHO_PIN = 26  # Replace with your actual ECHO pin number
 
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(TRIG_PIN, GPIO.OUT)
-        GPIO.setup(ECHO_PIN, GPIO.IN)
-
-        # Send a 10us pulse to trigger the sensor
-        GPIO.output(TRIG_PIN, True)
-        time.sleep(0.00001)
-        GPIO.output(TRIG_PIN, False)
-
-        # Measure the time for the echo to return
-        pulse_start = time.time()
-        pulse_end = time.time()
-
-        while GPIO.input(ECHO_PIN) == 0:
-            pulse_start = time.time()
-
-        while GPIO.input(ECHO_PIN) == 1:
-            pulse_end = time.time()
-
-        # Calculate distance in cm
-        pulse_duration = pulse_end - pulse_start
-        distance = (pulse_duration * 34300) / 2
-        distance = round(distance, 2)
-
-        # Cleanup GPIO
-        GPIO.cleanup()
+        try:
+            sensor = DistanceSensor(echo=ECHO_PIN, trigger=TRIG_PIN)
+            distance = sensor.distance * 100  # Convert to cm
+            distance = round(distance, 2)
+        except Exception as e:
+            logger.error(f"Error reading ultrasonic sensor: {e}")
+            distance = -1.0  # Indicate an error with a negative value
 
         return {
             'distance': distance,
@@ -93,23 +74,36 @@ class SensorInterface:
         }
     
     def _read_lidar_sensor(self) -> Dict[str, float]:
-        """Read data from lidar sensor"""
-        distance = 0.0
-        try:
-            import smbus
-            # Replace with your actual I2C address and setup
-            I2C_ADDRESS = 0x29  # Default I2C address for VL53L0X.
-            bus = smbus.SMBus(1)  # Use I2C bus 1
+        """Read data from lidar sensor using direct I2C communication."""
+        I2C_ADDRESS = 0x29  # Default I2C address for VL53L0X
+        RESULT_RANGE_STATUS = 0x14  # Register for range status
+        SYSRANGE_START = 0x00  # Register to start ranging
+        bus = smbus.SMBus(1)  # Use I2C bus 1
 
-            # Example: Read distance from VL53L0X
-            # You will need to use the appropriate library or commands for your lidar sensor
-            # This is a placeholder for actual lidar reading logic
-            distance = random.uniform(50.0, 200.0)  # Replace with actual reading logic
+        try:
+            # Initialize the sensor
+            bus.write_byte_data(I2C_ADDRESS, 0x80, 0x01)
+            bus.write_byte_data(I2C_ADDRESS, 0xFF, 0x01)
+            bus.write_byte_data(I2C_ADDRESS, 0x00, 0x00)
+            bus.write_byte_data(I2C_ADDRESS, 0x91, 0x3C)
+            bus.write_byte_data(I2C_ADDRESS, 0x00, 0x01)
+            bus.write_byte_data(I2C_ADDRESS, 0xFF, 0x00)
+            bus.write_byte_data(I2C_ADDRESS, 0x80, 0x00)
+
+            # Start ranging
+            bus.write_byte_data(I2C_ADDRESS, SYSRANGE_START, 0x01)
+            time.sleep(0.05)  # Wait for measurement
+
+            # Read range result
+            range_mm = bus.read_word_data(I2C_ADDRESS, RESULT_RANGE_STATUS + 10)
+            distance = range_mm / 10.0  # Convert mm to cm
+            distance = round(distance, 2)
         except Exception as e:
             logger.error(f"Error reading lidar sensor: {e}")
-            
+            distance = -1.0  # Indicate an error with a negative value
+
         return {
-            'distance': round(distance, 2),
+            'distance': distance,
             'timestamp': time.time()
         }
 
