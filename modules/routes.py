@@ -6,6 +6,7 @@ import logging
 from .monitor import SystemMonitor
 from .video_stream import video_stream  # Import the singleton instance
 from .gpio import motor_controller, servo_arm, servo_gripper, mp3_player
+from .sensor_interface import sensor_interface
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -169,3 +170,18 @@ def toggle_video():
             'streaming': False,
             'message': str(e)
         }), 503
+  
+@routes.route('/sensor-data')
+def sensor_data():
+    """Server-Sent Events endpoint for live sensor data."""
+    def generate():
+        while True:
+            try:
+                data = sensor_interface.get_latest_data()
+                if data:
+                    yield f"data: {json.dumps(data)}\n\n"
+                time.sleep(0.5)  # Adjust sampling rate as needed
+            except Exception as e:
+                print(f"Error in sensor-data SSE: {e}")
+                yield "data: {}\n\n"
+    return Response(generate(), mimetype='text/event-stream')

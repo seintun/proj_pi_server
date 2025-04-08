@@ -1,6 +1,7 @@
 from flask import Flask
 from modules.routes import routes
 import logging
+from modules.sensor_interface import sensor_interface
 
 # Configure logging
 logging.basicConfig(
@@ -21,6 +22,16 @@ def create_app():
         TEMPLATES_AUTO_RELOAD=True,  # Enable template auto-reload
         SEND_FILE_MAX_AGE_DEFAULT=0  # Prevent caching of static files during development
     )
+
+    # For sensor data collection
+    @app.before_first_request
+    def start_sensor_collection():
+        """Start sensor data collection when the app starts."""
+        try:
+            sensor_interface.start_collection()
+            logger.info("Sensor data collection started successfully.")
+        except Exception as e:
+            logger.error(f"Failed to start sensor data collection: {e}")
     
     @app.after_request
     def add_header(response):
