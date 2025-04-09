@@ -17,6 +17,9 @@ class SensorInterface:
         self.is_collecting = False
         self._collection_thread = None
         self._lock = threading.Lock()
+        # Start collection automatically upon initialization
+        self.start_collection()
+        logger.info("SensorInterface initialized and data collection started")
 
     def start_collection(self) -> None:
         """Start collecting sensor data in a separate thread."""
