@@ -5,7 +5,9 @@ import threading
 from queue import Queue
 import json
 from gpiozero import DistanceSensor
-import smbus  # For I2C communication
+import board
+import busio
+import adafruit_vl53l0x
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -17,6 +19,19 @@ class SensorInterface:
         self.is_collecting = False
         self._collection_thread = None
         self._lock = threading.Lock()
+        self._lidar = None
+
+        # Initialize the VL53L0X sensor
+        try:
+            logger.info("Initializing VL53L0X sensor...")
+            i2c = busio.I2C(board.SCL, board.SDA)
+            self._lidar = adafruit_vl53l0x.VL53L0X(i2c)
+            self._lidar.measurement_timing_budget = 200000  # Optional: Set timing budget
+            logger.info("VL53L0X sensor initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize VL53L0X sensor: {e}")
+            self._lidar = None
+
         # Start collection automatically upon initialization
         self.start_collection()
         logger.info("SensorInterface initialized and data collection started")
@@ -75,32 +90,21 @@ class SensorInterface:
             'distance': distance,
             'timestamp': time.time()
         }
-    
+
     def _read_lidar_sensor(self) -> Dict[str, float]:
-        """Read data from lidar sensor using direct I2C communication."""
-        I2C_ADDRESS = 0x29  # Default I2C address for VL53L0X
-        RESULT_RANGE_STATUS = 0x14  # Register for range status
-        SYSRANGE_START = 0x00  # Register to start ranging
-        bus = smbus.SMBus(1)  # Use I2C bus 1
+        """Read data from VL53L0X lidar sensor."""
+        if not self._lidar:
+            logger.debug("Lidar sensor not initialized (_lidar is None)")
+            return {
+                'distance': -1.0,
+                'timestamp': time.time()
+            }
 
         try:
-            # Initialize the sensor
-            bus.write_byte_data(I2C_ADDRESS, 0x80, 0x01)
-            bus.write_byte_data(I2C_ADDRESS, 0xFF, 0x01)
-            bus.write_byte_data(I2C_ADDRESS, 0x00, 0x00)
-            bus.write_byte_data(I2C_ADDRESS, 0x91, 0x3C)
-            bus.write_byte_data(I2C_ADDRESS, 0x00, 0x01)
-            bus.write_byte_data(I2C_ADDRESS, 0xFF, 0x00)
-            bus.write_byte_data(I2C_ADDRESS, 0x80, 0x00)
-
-            # Start ranging
-            bus.write_byte_data(I2C_ADDRESS, SYSRANGE_START, 0x01)
-            time.sleep(0.05)  # Wait for measurement
-
-            # Read range result
-            range_mm = bus.read_word_data(I2C_ADDRESS, RESULT_RANGE_STATUS + 10)
-            distance = range_mm / 10.0  # Convert mm to cm
-            distance = round(distance, 2)
+            logger.debug("Attempting to read distance from lidar...")
+            distance_mm = self._lidar.range
+            logger.debug(f"Raw distance reading: {distance_mm}mm")
+            distance = round(distance_mm / 10.0, 2)  # Convert mm to cm
         except Exception as e:
             logger.error(f"Error reading lidar sensor: {e}")
             distance = -1.0  # Indicate an error with a negative value
