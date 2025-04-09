@@ -27,6 +27,7 @@ class SensorInterface:
             i2c = busio.I2C(board.SCL, board.SDA)
             self._lidar = adafruit_vl53l0x.VL53L0X(i2c)
             self._lidar.measurement_timing_budget = 200000  # Optional: Set timing budget
+            time.sleep(0.1)  # Allow sensor to stabilize
             logger.info("VL53L0X sensor initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize VL53L0X sensor: {e}")
@@ -103,8 +104,11 @@ class SensorInterface:
         try:
             logger.debug("Attempting to read distance from lidar...")
             distance_mm = self._lidar.range
-            logger.debug(f"Raw distance reading: {distance_mm}mm")
-            distance = round(distance_mm / 10.0, 2)  # Convert mm to cm
+            if distance_mm < 30 or distance_mm > 1000:  # Validate range (0-1200mm typical for VL53L0X)
+                logger.warning(f"Invalid lidar reading: {distance_mm}mm")
+                distance_mm = -1.0
+            logger.debug(f"Validated distance reading: {distance_mm}mm")
+            distance = round(distance_mm / 10, 2)  # Convert mm to cm
         except Exception as e:
             logger.error(f"Error reading lidar sensor: {e}")
             distance = -1.0  # Indicate an error with a negative value
