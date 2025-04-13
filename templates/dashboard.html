@@ -14,6 +14,7 @@
     <script src="{{ url_for('static', filename='js/player.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sensor-data.js') }}"></script>
     <script src="{{ url_for('static', filename='js/path.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/saving.js') }}"></script>
 </head>
 
 <body>
@@ -93,6 +94,7 @@
         <button id="toggleMode">AI Mode</button>
         <button id="helloButton">Say Hello</button>
         <button class="saving-toggle-btn">
+            <span class="saving-status-icon">⚪</span>
             <span class="saving-status-text">Start Recording</span>
         </button>
     </div>

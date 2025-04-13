@@ -324,6 +324,37 @@ body {
     animation: shake 0.5s linear;
 }
 
+.saving-toggle-btn {
+    width: 80%; /* Match size of #helloButton and #toggleMode */
+    height: 50px; /* Match size of #helloButton and #toggleMode */
+    font-size: 1.2em; /* Match font size */
+    font-family: 'Roboto Mono', monospace; /* Match font */
+    background-color: #ffdb15; /* Match background color */
+    color: #121212; /* Match text color */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 5px;
+    box-shadow: 0 4px 10px #ffdb15;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.saving-toggle-btn:active {
+    background-color: #fcc303; /* Match active state color */
+    box-shadow: 0 0 15px #fcc303, 0 0 30px #fcc303;
+}
+
+.saving-status-icon {
+    color: #00ff00;
+    font-size: 12px;
+    transition: color 0.3s ease;
+}
+
+.saving-toggle-btn.recording .saving-status-icon {
+    animation: blink 1s infinite;
+}
+
 /* Controls */
 button {
     width: 80%;

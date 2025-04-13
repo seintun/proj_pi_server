@@ -53,6 +53,7 @@ class SensorInterface:
 
     def _collect_data(self) -> None:
         """Continuously collect data from sensors."""
+        interval = 0.5  # Match the interval with the data collector
         while self.is_collecting:
             try:
                 # Real-time sensor readings
@@ -71,7 +72,7 @@ class SensorInterface:
             except Exception as e:
                 logger.error(f"Error collecting sensor data: {e}")
                 
-            time.sleep(0.4)  # Wait before retrying
+            time.sleep(interval)  # Adjusted interval
 
     def _read_ultrasonic_sensor(self) -> Dict[str, float]:
         """Read data from ultrasonic sensor using gpiozero"""

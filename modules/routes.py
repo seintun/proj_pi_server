@@ -6,6 +6,7 @@ from .monitor import SystemMonitor
 from .video_stream import video_stream  # Import the singleton instance
 from .gpio import motor_controller, servo_arm, servo_gripper, mp3_player, encoder_tracker
 from .sensor_interface import sensor_interface
+from .saving import data_collector
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 routes = Blueprint('routes', __name__)
 system_monitor = SystemMonitor()
+is_recording = False  # Track recording state
 
 @routes.route('/')
 def index():
@@ -205,3 +207,18 @@ def sensor_data():
                 print(f"Error in sensor-data SSE: {e}")
                 yield "data: {}\n\n"
     return Response(generate(), mimetype='text/event-stream')
+
+@routes.route('/api/recording/toggle', methods=['POST'])
+def toggle_recording():
+    """Toggle the recording state."""
+    global is_recording
+    if is_recording:
+        data_collector.stop_collection()
+    else:
+        data_collector.start_collection()
+    is_recording = not is_recording
+    return jsonify({
+        'status': 'success',
+        'recording': is_recording,
+        'message': 'Recording state toggled successfully'
+    })
