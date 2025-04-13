@@ -12,7 +12,7 @@ class motorControl:
         self.left_motor_direction = 0  # Initialize instance variable
         self.right_motor_direction = 0  # Initialize instance variable
         # Correct for hardware configuration
-        self.correction_right = 0.95
+        self.correction_right = 1.0
         self.correction_left = 1.0
         # Calculate actual speed for each motor
         self.actual_speed_right = self.speed * self.correction_right #30rpm
