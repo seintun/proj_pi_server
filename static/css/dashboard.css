@@ -7,50 +7,114 @@ body {
     background-color: #121212;
     color: #ffdb15;
     margin: 0;
-    padding: 0;
+    padding: 0; /* Remove any unnecessary padding */
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 10px;
-    height: 100vh;
+    /* grid-template-columns: 1fr 2fr 1fr; */
+    /* grid-template-rows: 1fr 1fr; */
+    gap: 20px; /* Add consistent spacing between rows and columns */
+    height: 100vh; /* Full viewport height */
+    width: 100%; /* Ensure full width of the screen */
+    box-sizing: border-box; /* Include padding and borders in width/height calculations */
+    overflow: hidden; /* Prevent scrolling */
 }
 
-.container {
+/* First Row Grid */
+#first-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; /* 3 columns: middle column is wider */
+    gap: 20px; /* Add space between the containers */
+    width: 100%; /* Full width of the screen */
+    height: 100%; /* Full height of its grid row */
+}
+
+#second-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* 3 equal columns */
+    gap: 20px; /* Add space between the containers */
+    width: 100%; /* Full width of the screen */
+    height: 100%; /* Full height of its grid row */
+    padding: 0; /* Remove extra padding to avoid overflow */
+}
+
+#first-row .container {
+    width: 100%; /* Take full width of their grid cell */
+    height: 100%; /* Take full height of their grid cell */
     background-color: #1E1E1E;
     border: 2px solid #ffdb15;
     border-radius: 15px;
-    padding: 20px;
+    padding: 10px;
     box-shadow: 0 4px 15px #ffdb15;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     font-weight: bold;
+    overflow: hidden;
 }
+
+#second-row .container {
+    width: 100%; /* Take full width of their grid cell */
+    height: 100%; /* Take full height of their grid cell */
+    background-color: #1E1E1E;
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    padding: 10px; /* Internal padding for content */
+    box-shadow: 0 4px 15px #ffdb15;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.container {
+    background-color: #1E1E1E;
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    padding: 20px; 
+    margin: 10px;
+    box-shadow: 0 4px 15px #ffdb15;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+h1, h2, h3 {
+    font-size: clamp(1rem, 2vw, 2rem); /* Dynamically scale font size */
+    margin: 0;
+}
+
+button {
+    width: clamp(60px, 10vw, 120px); /* Dynamically scale button width */
+    height: clamp(40px, 5vh, 60px); /* Dynamically scale button height */
+    font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+} 
 
 /* Grid Layout */
 #system-stats { grid-column: 1; grid-row: 1; }
 #camera-feed { grid-column: 2; grid-row: 1; }
-#toggle-mode { grid-column: 3; grid-row: 1; }
-#robot-path { grid-column: 2; grid-row: 3; }
-#arm-gripper { grid-column: 1; grid-row: 3; }
-#joystick { grid-column: 3; grid-row: 3; }
+#live-charts { grid-column: 3; grid-row: 1; }
+#robot-path { grid-column: 2; grid-row: 2; }
+#arm-gripper { grid-column: 1; grid-row: 2; }
+#joystick { grid-column: 3; grid-row: 2; }
 
-/* Charts Container */
-.charts-container {
-    grid-column: span 3;
-    grid-row: 2;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    padding: 15px;
-    background: #1E1E1E;
-    border: 2px solid #ffdb15;
-    border-radius: 15px;
-    margin: 10px;
+/* Ensure all containers have the same width */
+#arm-gripper, #robot-path, #joystick {
+    width: 100%; /* Take full width of their grid cell */
+}
+
+
+.chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .chart-wrapper {
+    width: 100%;
     height: 150px;
     background: #000;
     border-radius: 10px;
@@ -205,7 +269,8 @@ body {
 
 .video-feed {
     width: 100%;
-    height: 100%;
+    height: 0;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
     border: 2px solid #ffdb15;
     border-radius: 10px;
     background-color: #000;
@@ -214,11 +279,13 @@ body {
 }
 
 .video-feed img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 8px;
-    background-color: #000;
 }
 
 .camera-status {
@@ -399,8 +466,16 @@ button:active {
 /* Responsive Design */
 @media (max-width: 1200px) {
     body {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
+        grid-template-columns: 1fr; /* Single column layout */
+        grid-template-rows: repeat(6, 1fr); /* Stack all containers vertically */
+    }
+
+    .container {
+        padding: 5px; /* Reduce padding for smaller screens */
+    }
+
+    .video-feed {
+        padding-top: 75%; /* Adjust aspect ratio for smaller screens */
     }
     
     .charts-container {
@@ -410,5 +485,15 @@ button:active {
     
     .chart-wrapper {
         height: 120px;
+    }
+}
+
+@media (max-height: 800px) {
+    .container {
+        padding: 5px;
+    }
+
+    button {
+        font-size: 0.8rem;
     }
 }
