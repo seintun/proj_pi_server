@@ -7,11 +7,11 @@ body {
     background-color: #121212;
     color: #ffdb15;
     margin: 0;
-    padding: 0; /* Remove any unnecessary padding */
+    padding: 20px 0 20px 0; /* Remove any unnecessary padding */
     display: grid;
     /* grid-template-columns: 1fr 2fr 1fr; */
     /* grid-template-rows: 1fr 1fr; */
-    gap: 20px; /* Add consistent spacing between rows and columns */
+    gap: 0; /* Add consistent spacing between rows and columns */
     height: 100vh; /* Full viewport height */
     width: 100%; /* Ensure full width of the screen */
     box-sizing: border-box; /* Include padding and borders in width/height calculations */
@@ -24,16 +24,11 @@ body {
     grid-template-columns: 1fr 2fr 1fr; /* 3 columns: middle column is wider */
     gap: 20px; /* Add space between the containers */
     width: 100%; /* Full width of the screen */
-    height: 100%; /* Full height of its grid row */
-}
-
-#second-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr; /* 3 equal columns */
-    gap: 20px; /* Add space between the containers */
-    width: 100%; /* Full width of the screen */
-    height: 100%; /* Full height of its grid row */
-    padding: 0; /* Remove extra padding to avoid overflow */
+    height: 50vh; /* Full height of its grid row */
+    padding: 0 20px;
+    margin-bottom: 0;
+    box-sizing: border-box; /* Include padding and borders in width/height calculations */
+    overflow: hidden; /* Prevent overflow */
 }
 
 #first-row .container {
@@ -42,13 +37,27 @@ body {
     background-color: #1E1E1E;
     border: 2px solid #ffdb15;
     border-radius: 15px;
-    padding: 10px;
+    padding: 10px; /* Internal padding for content */
+    margin: 0; /* Remove external margins to prevent overflow */
     box-shadow: 0 4px 15px #ffdb15;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     font-weight: bold;
+    box-sizing: border-box;
+    overflow: hidden;    
+}
+
+#second-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* 3 equal columns */
+    gap: 20px; /* Add space between the containers */
+    width: 100%; /* Full width of the screen */
+    height: 50vh; /* Full height of its grid row */
+    padding: 0 20px; /* Remove extra padding to avoid overflow */
+    margin-top: -40px;
+    box-sizing: border-box;
     overflow: hidden;
 }
 
@@ -59,13 +68,15 @@ body {
     border: 2px solid #ffdb15;
     border-radius: 15px;
     padding: 10px; /* Internal padding for content */
+    margin: 0; /* Remove external margins to prevent overflow */
     box-shadow: 0 4px 15px #ffdb15;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    overflow: hidden;
+    box-sizing: border-box; /* Include padding and borders in width/height calculations */
+    overflow: hidden; /* Prevent content overflow */
 }
 
 .container {
@@ -88,11 +99,27 @@ h1, h2, h3 {
     margin: 0;
 }
 
-button {
-    width: clamp(60px, 10vw, 120px); /* Dynamically scale button width */
-    height: clamp(40px, 5vh, 60px); /* Dynamically scale button height */
+/* button {
+    width: clamp(60px, 10vw, 120px);
+    height: clamp(40px, 5vh, 60px); 
     font-size: clamp(0.8rem, 1.5vw, 1.2rem);
-} 
+}  */
+
+/* button {
+    width: 80%;
+    height: 50px;
+    font-size: 1.2em;
+    font-family: 'Roboto Mono', monospace;
+    background-color: #ffdb15;
+    color: #121212;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 5px;
+    box-shadow: 0 4px 10px #ffdb15;
+    transition: all 0.3s ease;
+    font-weight: bold;
+} */
 
 /* Grid Layout */
 #system-stats { grid-column: 1; grid-row: 1; }
@@ -111,14 +138,16 @@ button {
 .chart-wrapper canvas {
     width: 100% !important;
     height: 100% !important;
+    box-sizing: border-box;
 }
 
 .chart-wrapper {
-    width: 100%;
+    width: 90%;
     height: 150px;
     background: #000;
     border-radius: 10px;
     padding: 15px;
+    margin-bottom: 20px;
     border: 1px solid #ffdb15;
     position: relative;
     overflow: hidden;
@@ -142,20 +171,32 @@ button {
 }
 
 /* System Stats and Sensor Data */
-.system-stats {
-    width: 100%;
+#system-stats {
+    display: flex;
+    flex-direction: column; /* Stack contents vertically */
+    justify-content: center; /* Center contents vertically */
+    align-items: center; /* Center contents horizontally */
+    width: 100%; /* Full width of the grid cell */
+    height: 100%; /* Full height of the grid cell */
+    background-color: #1E1E1E;
     border: 2px solid #ffdb15;
-    border-radius: 10px;
-    background-color: #000;
-    padding: 15px;
-    box-sizing: border-box;
-    box-shadow: 0 0 20px #ffdb15;
-    font-size: 16px;
-    margin-bottom: 15px;
+    border-radius: 15px;
+    padding: 10px; /* Internal padding for content */
+    margin: 0; /* Remove external margins */
+    box-shadow: 0 4px 15px #ffdb15;
+    overflow: hidden; /* Prevent content overflow */
+    box-sizing: border-box; /* Include padding and borders in width/height calculations */
 }
 
-.stat-group {
+/* .stat-group {
     margin-bottom: 15px;
+} */
+
+#system-stats .stat-group {
+    width: 100%; /* Ensure the stat group takes full width */
+    text-align: center; /* Center-align text */
+    font-size: clamp(0.8rem, 1.5vw, 1.2rem); /* Dynamically scale font size */
+    margin-bottom: 10px; /* Add spacing between groups */
 }
 
 .stat-group h3 {
@@ -165,25 +206,23 @@ button {
     text-shadow: 0 0 5px #ffdb15;
 }
 
-.stat-list {
-    list-style: none;
+#system-stats .stat-list {
+    list-style: none; /* Remove bullet points */
     padding: 0;
     margin: 0;
+    font-size: clamp(0.7rem, 1.2vw, 1rem); /* Dynamically scale font size */
 }
 
-.stat-list li {
-    margin: 5px 0;
+#system-stats .stat-list li {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
+    justify-content: space-between; /* Align label and value */
+    margin: 5px 0;
 }
 
-.stat-value {
-    color: #ffdb15;
+#system-stats .stat-value {
     font-weight: bold;
+    color: #ffdb15;
     text-shadow: 0 0 5px #ffdb15;
-    margin-left: 10px;
 }
 
 .memory-line {
@@ -245,6 +284,8 @@ button {
     text-shadow: 0 0 5px #ffdb15;
 }
 
+
+
 /* Video Feed */
 .camera-header {
     width: 100%;
@@ -270,12 +311,13 @@ button {
 .video-feed {
     width: 100%;
     height: 0;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    padding-top: 56.25%;
     border: 2px solid #ffdb15;
     border-radius: 10px;
     background-color: #000;
     overflow: hidden;
     position: relative;
+    box-sizing: border-box;
 }
 
 .video-feed img {
@@ -391,7 +433,75 @@ button {
 }
 
 /* Controls */
-button {
+#arm-gripper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #1E1E1E;
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 15px #ffdb15;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.arm-gripper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    grid-template-rows: repeat(2, 1fr); /* 2 rows */
+    gap: 15px; /* Add spacing between buttons */
+    width: 100%; /* Full width of the container */
+    height: auto; /* Adjust height dynamically */
+    justify-items: center; /* Center buttons horizontally */
+    align-items: center; /* Center buttons vertically */
+}
+
+.arm-gripper button {
+    width: 80px; /* Set a fixed width */
+    height: 80px; /* Set the height equal to the width to make it a square */
+    font-size: 0.9rem; /* Adjust font size to fit within the square */
+    font-family: 'Roboto Mono', monospace;
+    background-color: #ffdb15;
+    color: #121212;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px #ffdb15;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    text-align: center; /* Center text inside the button */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+}
+
+#toggleMode {
+    width: 85%; /* Keep the button width consistent */
+    height: 50px; /* Set a consistent height */
+    font-size: 1rem; /* Match the font size of other buttons */
+    font-family: 'Roboto Mono', monospace;
+    background-color: #ffdb15;
+    color: #121212;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px #ffdb15;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    text-align: center; /* Center text inside the button */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    margin-bottom: 20px; /* Add spacing below the button */
+    position: relative; /* Allow positioning adjustments */
+    top: -10px; /* Move the button higher */
+}
+
+/* button {
     width: 80%;
     height: 50px;
     font-size: 1.2em;
@@ -405,12 +515,14 @@ button {
     box-shadow: 0 4px 10px #ffdb15;
     transition: all 0.3s ease;
     font-weight: bold;
-}
+} */
 
-button:active {
+/* button:active {
     background-color: #fcc303;
     box-shadow: 0 0 15px #fcc303, 0 0 30px #fcc303;
-}
+} */
+
+
 
 /* Joystick Controls */
 .joystick {
@@ -423,10 +535,19 @@ button:active {
 }
 
 .joystick button {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-    border-radius: 50%;
+    width: 80px; /* Increase the width */
+    height: 80px; /* Increase the height to match the width */
+    font-size: 28px; /* Adjust font size for larger buttons */
+    border-radius: 50%; /* Keep the buttons circular */
+    background-color: #ffdb15; /* Optional: Ensure consistent styling */
+    color: #121212; /* Optional: Text color */
+    border: none;
+    box-shadow: 0 4px 10px #ffdb15;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Critical Value Indicators */
@@ -469,6 +590,8 @@ button:active {
         grid-template-columns: 1fr; /* Single column layout */
         grid-template-rows: repeat(6, 1fr); /* Stack all containers vertically */
     }
+
+
 
     .container {
         padding: 5px; /* Reduce padding for smaller screens */
