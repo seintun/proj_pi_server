@@ -24,8 +24,7 @@ def create_app():
     )
 
     # For sensor data collection
-    @app.before_first_request
-    def start_sensor_collection():
+    with app.app_context():
         """Start sensor data collection when the app starts."""
         try:
             sensor_interface.start_collection()
