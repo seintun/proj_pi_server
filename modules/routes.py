@@ -120,22 +120,37 @@ def get_camera_type():
             'message': str(e)
         }), 503
 
+@routes.route('/ai/toggle', methods=['POST'])
+def toggle_ai():
+    """Toggle ai on/off"""
+    successful = True
+    message = "AI Mode Toggled Successfully"
+    try:
+        is_ai_mode  = video_stream.toggle_ai()
+    except Exception as e:
+        successful = False
+        message = e
+    return jsonify({
+        'status': 'success' if successful else 'error',
+        'streaming': is_ai_mode if successful else False,
+        'message': message
+    })
+
 @routes.route('/video/toggle', methods=['POST'])
 def toggle_video():
     """Toggle video stream on/off"""
+    successful = True
+    message = "Video stream toggled successfully"
     try:
         is_streaming = video_stream.toggle_stream()
-        return jsonify({
-            'status': 'success',
-            'streaming': is_streaming,
-            'message': 'Video stream toggled successfully'
-        })
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'streaming': False,
-            'message': str(e)
-        }), 503
+    except Excetion as e:
+        successful = False
+        message = str(e)
+    return jsonify({
+        'status': 'success' if successful else 'error',
+        'streaming': is_streaming if successful else False,
+        'message': message
+    })
   
 @routes.route('/sensor-data')
 def sensor_data():
