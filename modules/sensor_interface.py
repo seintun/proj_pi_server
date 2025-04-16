@@ -1,8 +1,14 @@
-from typing import Dict, Optional, List
+import logging
 import time
+from typing import Dict, Optional, List
 import threading
 from queue import Queue
 import json
+import random
+import RPi.GPIO as GPIO
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 class SensorInterface:
     def __init__(self):
@@ -30,41 +36,91 @@ class SensorInterface:
         """Continuously collect data from sensors."""
         while self.is_collecting:
             try:
-                # Placeholder for actual sensor reading logic
-                # TODO: Implement actual sensor reading here
-                sensor_reading = self._read_distance_sensor()
+                # Real-time sensor readings
+                ultrasonic_reading = self._read_ultrasonic_sensor()
+                lidar_reading = self._read_lidar_sensor()
                 
                 with self._lock:
-                    self.sensor_data.update(sensor_reading)
+                    self.sensor_data.update({
+                        'ultrasonic': ultrasonic_reading,
+                        'lidar': lidar_reading
+                    })
                 
-                # Add to queue for processing
-                if not self.data_queue.full():
-                    self.data_queue.put(sensor_reading)
-                
-                time.sleep(0.1)  # Adjust sampling rate as needed
+                logger.debug(f"Ultrasonic Reading: {ultrasonic_reading}")
+                logger.debug(f"Lidar Reading: {lidar_reading}")
                 
             except Exception as e:
-                print(f"Error collecting sensor data: {e}")
-                time.sleep(1)  # Wait before retrying
+                logger.error(f"Error collecting sensor data: {e}")
+                
+            time.sleep(0.5)  # Wait before retrying
 
-    def _read_distance_sensor(self) -> Dict[str, float]:
-        """Read data from distance sensor.
+    def _read_ultrasonic_sensor(self) -> Dict[str, float]:
+        """Read data from ultrasonic sensor using GPIO"""
         
-        TODO: Implement actual sensor reading logic using GPIO
-        This is a placeholder that returns dummy data.
-        """
+        TRIG_PIN = 23  # Replace with your actual TRIG pin number
+        ECHO_PIN = 24  # Replace with your actual ECHO pin number
+
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(TRIG_PIN, GPIO.OUT)
+        GPIO.setup(ECHO_PIN, GPIO.IN)
+
+        # Send a 10us pulse to trigger the sensor
+        GPIO.output(TRIG_PIN, True)
+        time.sleep(0.00001)
+        GPIO.output(TRIG_PIN, False)
+
+        # Measure the time for the echo to return
+        pulse_start = time.time()
+        pulse_end = time.time()
+
+        while GPIO.input(ECHO_PIN) == 0:
+            pulse_start = time.time()
+
+        while GPIO.input(ECHO_PIN) == 1:
+            pulse_end = time.time()
+
+        # Calculate distance in cm
+        pulse_duration = pulse_end - pulse_start
+        distance = (pulse_duration * 34300) / 2
+        distance = round(distance, 2)
+
+        # Cleanup GPIO
+        GPIO.cleanup()
+
         return {
-            'distance': 0.0,  # Distance in cm
+            'distance': distance,
+            'timestamp': time.time()
+        }
+    
+    def _read_lidar_sensor(self) -> Dict[str, float]:
+        """Read data from lidar sensor"""
+        distance = 0.0
+        try:
+            import smbus
+            # Replace with your actual I2C address and setup
+            I2C_ADDRESS = 0x29  # Default I2C address for VL53L0X.
+            bus = smbus.SMBus(1)  # Use I2C bus 1
+
+            # Example: Read distance from VL53L0X
+            # You will need to use the appropriate library or commands for your lidar sensor
+            # This is a placeholder for actual lidar reading logic
+            distance = random.uniform(50.0, 200.0)  # Replace with actual reading logic
+        except Exception as e:
+            logger.error(f"Error reading lidar sensor: {e}")
+            
+        return {
+            'distance': round(distance, 2),
             'timestamp': time.time()
         }
 
     def get_latest_data(self) -> Dict[str, float]:
-        """Get the most recent sensor reading."""
+        # Get the most recent sensor reading
         with self._lock:
+            logger.debug(f"Latest sensor data: {self.sensor_data}")
             return self.sensor_data.copy()
 
     def get_data_batch(self, batch_size: int = 10) -> List[Dict[str, float]]:
-        """Get a batch of recent sensor readings."""
+        # Get a batch of recent sensor readings
         batch = []
         while len(batch) < batch_size and not self.data_queue.empty():
             batch.append(self.data_queue.get())
