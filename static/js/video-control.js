@@ -115,7 +115,7 @@ class VideoController {
                 // Update video source if streaming is enabled
                 if (this.isStreaming) {
                     // Add timestamp to prevent caching
-                    this.feedImage.src = `/video_feed?t=${Date.now()}`;
+                    this.feedImage.src = `/video_feed`;
                 }
             } else {
                 throw new Error(data.message || 'Failed to toggle video stream');
