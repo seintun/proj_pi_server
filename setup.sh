@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# To Run, type ` . startup.sh `
+# To Run, type ` . startup.sh ` or ` source startup.sh `
 # Note the period^
 
 python3 -m venv --system-site-packages venv 
