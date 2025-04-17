@@ -18,8 +18,8 @@ class servoControl:
 
         # Define positions of the servos
         # Typical range is 500000 (0°) to 2500000 (180°)
-        self.up_position = 1600000
-        self.down_position = 1300000
+        self.up_position = 1650000
+        self.down_position = 1500000
         self.closed_position = 2400000
         self.opened_position = 1500000
         self.current_position_arm = initial_position
@@ -145,7 +145,7 @@ servo_arm = servoControl(
     pwm_chip="/sys/class/pwm/pwmchip0",
     pwm_channel="pwm2",
     gpio_name="GPIO18",
-    initial_position=1300000
+    initial_position=1500000
 )
 
 servo_gripper = servoControl(

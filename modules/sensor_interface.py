@@ -59,19 +59,23 @@ class SensorInterface:
                 # Real-time sensor readings
                 ultrasonic_reading = self._read_ultrasonic_sensor()
                 lidar_reading = self._read_lidar_sensor()
-                
+
+                # Check if ultrasonic sensor distance is greater than 100 cm
+                if ultrasonic_reading['distance'] > 100:
+                    lidar_reading['distance'] = "Out of range"
+
                 with self._lock:
                     self.sensor_data.update({
                         'ultrasonic': ultrasonic_reading,
                         'lidar': lidar_reading
                     })
-                
+
                 logger.debug(f"Ultrasonic Reading: {ultrasonic_reading}")
                 logger.debug(f"Lidar Reading: {lidar_reading}")
-                
+
             except Exception as e:
                 logger.error(f"Error collecting sensor data: {e}")
-                
+
             time.sleep(interval)  # Adjusted interval
 
     def _read_ultrasonic_sensor(self) -> Dict[str, float]:
@@ -81,9 +85,18 @@ class SensorInterface:
         ECHO_PIN = 26  # Replace with your actual ECHO pin number
 
         try:
-            sensor = DistanceSensor(echo=ECHO_PIN, trigger=TRIG_PIN)
-            distance = sensor.distance * 100  # Convert to cm
-            distance = round(distance, 2)
+            # Set max_distance to 4.0 meters (400 cm)
+            sensor = DistanceSensor(echo=ECHO_PIN, trigger=TRIG_PIN, max_distance=9.0)
+            raw_distance_1 = sensor.distance * 100  # Convert to cm
+            raw_distance_2 = 1.0029 * raw_distance_1 + 0.2654
+            distance = round(raw_distance_2, 2)
+
+            # Check if the distance exceeds the maximum range
+            if raw_distance_1 > 400:  # 400 cm is the max_distance in cm
+                return {
+                    'distance': "Out of range",
+                    'timestamp': time.time()
+                }
         except Exception as e:
             logger.error(f"Error reading ultrasonic sensor: {e}")
             distance = -1.0  # Indicate an error with a negative value
@@ -105,11 +118,13 @@ class SensorInterface:
         try:
             logger.debug("Attempting to read distance from lidar...")
             distance_mm = self._lidar.range
-            if distance_mm < 30 or distance_mm > 1000:  # Validate range (0-1200mm typical for VL53L0X)
+            if distance_mm < 30 or distance_mm > 1000:  # Validate range (0-1000mm typical for VL53L0X)
                 logger.warning(f"Invalid lidar reading: {distance_mm}mm")
                 distance_mm = -1.0
             logger.debug(f"Validated distance reading: {distance_mm}mm")
-            distance = round(distance_mm / 10, 2)  # Convert mm to cm
+            raw_distance_1 = distance_mm / 10  # Convert mm to cm
+            raw_distance_2 = 6e-10 * raw_distance_1**6 - 2e-7 * raw_distance_1**5 + 3e-5 * raw_distance_1**4 - 0.0023 * raw_distance_1**3 + 0.0817 * raw_distance_1**2 - 0.3912 * raw_distance_1 + 4.7317
+            distance = round(raw_distance_2, 2)
         except Exception as e:
             logger.error(f"Error reading lidar sensor: {e}")
             distance = -1.0  # Indicate an error with a negative value
