@@ -48,7 +48,7 @@ except KeyboardInterrupt:
     video_stream.cleanup()
 
     # Cleanup motor controller
-    motor_controller.cleanup()
+    # motor_controller.cleanup()
 
     # Cleanup servo controllers
     servo_arm.cleanup()

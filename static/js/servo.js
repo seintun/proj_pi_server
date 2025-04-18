@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const SERVO_BASE_PATH = '/api/gpio/servo';
     const raiseButton = document.getElementById('raise_arm_button');
     const lowerButton = document.getElementById('lower_arm_button');
     const openButton = document.getElementById('open_gripper_button');
@@ -14,11 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    raiseButton?.addEventListener('mousedown', () => sendServoCommand('/api/gpio/servo/up'));
+    raiseButton?.addEventListener('mousedown', () => sendServoCommand(`${SERVO_BASE_PATH}/up`));
 
-    lowerButton?.addEventListener('mousedown', () => sendServoCommand('/api/gpio/servo/down'));
+    lowerButton?.addEventListener('mousedown', () => sendServoCommand(`${SERVO_BASE_PATH}/down`));
 
-    openButton?.addEventListener('mousedown', () => sendServoCommand('/api/gpio/servo/open'));
+    openButton?.addEventListener('mousedown', () => sendServoCommand(`${SERVO_BASE_PATH}/open`));
 
-    closeButton?.addEventListener('mousedown', () => sendServoCommand('/api/gpio/servo/close'));
+    closeButton?.addEventListener('mousedown', () => sendServoCommand(`${SERVO_BASE_PATH}/close`));
 });
