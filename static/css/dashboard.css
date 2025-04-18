@@ -9,8 +9,6 @@ body {
     margin: 0;
     padding: 20px 0 20px 0; /* Remove any unnecessary padding */
     display: grid;
-    /* grid-template-columns: 1fr 2fr 1fr; */
-    /* grid-template-rows: 1fr 1fr; */
     gap: 0; /* Add consistent spacing between rows and columns */
     height: 100vh; /* Full viewport height */
     width: 100%; /* Ensure full width of the screen */
@@ -26,7 +24,7 @@ body {
     width: 100%; /* Full width of the screen */
     height: 50vh; /* Full height of its grid row */
     padding: 0 20px;
-    margin-bottom: 0;
+    margin-bottom: 10px;
     box-sizing: border-box; /* Include padding and borders in width/height calculations */
     overflow: hidden; /* Prevent overflow */
 }
@@ -52,11 +50,13 @@ body {
 #second-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr; /* 3 equal columns */
+    grid-template-rows: 1fr;
     gap: 20px; /* Add space between the containers */
     width: 100%; /* Full width of the screen */
-    height: 50vh; /* Full height of its grid row */
+    height: 45vh; /* Full height of its grid row */
     padding: 0 20px; /* Remove extra padding to avoid overflow */
-    margin-top: -40px;
+    margin-top: 0;
+    margin-bottom: 0;
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -99,28 +99,6 @@ h1, h2, h3 {
     margin: 0;
 }
 
-/* button {
-    width: clamp(60px, 10vw, 120px);
-    height: clamp(40px, 5vh, 60px); 
-    font-size: clamp(0.8rem, 1.5vw, 1.2rem);
-}  */
-
-/* button {
-    width: 80%;
-    height: 50px;
-    font-size: 1.2em;
-    font-family: 'Roboto Mono', monospace;
-    background-color: #ffdb15;
-    color: #121212;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin: 5px;
-    box-shadow: 0 4px 10px #ffdb15;
-    transition: all 0.3s ease;
-    font-weight: bold;
-} */
-
 /* Grid Layout */
 #system-stats { grid-column: 1; grid-row: 1; }
 #camera-feed { grid-column: 2; grid-row: 1; }
@@ -132,8 +110,9 @@ h1, h2, h3 {
 /* Ensure all containers have the same width */
 #arm-gripper, #robot-path, #joystick {
     width: 100%; /* Take full width of their grid cell */
+    grid-column: auto;
+    grid-row: auto;
 }
-
 
 .chart-wrapper canvas {
     width: 100% !important;
@@ -188,10 +167,6 @@ h1, h2, h3 {
     box-sizing: border-box; /* Include padding and borders in width/height calculations */
 }
 
-/* .stat-group {
-    margin-bottom: 15px;
-} */
-
 #system-stats .stat-group {
     width: 100%; /* Ensure the stat group takes full width */
     text-align: center; /* Center-align text */
@@ -204,6 +179,12 @@ h1, h2, h3 {
     font-size: 16px;
     margin: 0 0 10px 0;
     text-shadow: 0 0 5px #ffdb15;
+}
+
+#system-stats .system-stats p {
+    text-align: left; /* Align the text to the left */
+    margin: 5px 0; /* Add spacing between the lines */
+    font-size: 1rem; /* Ensure consistent font size */    
 }
 
 #system-stats .stat-list {
@@ -284,8 +265,6 @@ h1, h2, h3 {
     text-shadow: 0 0 5px #ffdb15;
 }
 
-
-
 /* Video Feed */
 .camera-header {
     width: 100%;
@@ -308,10 +287,27 @@ h1, h2, h3 {
     color: #ffdb15;
 }
 
+#camera-feed {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the camera feed horizontally */
+    justify-content: center; /* Center the camera feed vertically */
+    padding: 10px; /* Add spacing around the video feed */
+    background-color: #1E1E1E; /* Optional: Background color for the container */
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    box-sizing: border-box; /* Include padding in width/height calculations */
+    overflow: hidden; /* Prevent content overflow */
+    width: 100%;
+    height: 100%;
+    max-width: none; /* Limit the maximum width of the camera feed */
+    margin: 0 auto; /* Center the container on the page */
+}
+
 .video-feed {
     width: 100%;
     height: 0;
-    padding-top: 56.25%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
     border: 2px solid #ffdb15;
     border-radius: 10px;
     background-color: #000;
@@ -501,29 +497,6 @@ h1, h2, h3 {
     top: -10px; /* Move the button higher */
 }
 
-/* button {
-    width: 80%;
-    height: 50px;
-    font-size: 1.2em;
-    font-family: 'Roboto Mono', monospace;
-    background-color: #ffdb15;
-    color: #121212;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin: 5px;
-    box-shadow: 0 4px 10px #ffdb15;
-    transition: all 0.3s ease;
-    font-weight: bold;
-} */
-
-/* button:active {
-    background-color: #fcc303;
-    box-shadow: 0 0 15px #fcc303, 0 0 30px #fcc303;
-} */
-
-
-
 /* Joystick Controls */
 .joystick {
     display: grid;
@@ -591,8 +564,6 @@ h1, h2, h3 {
         grid-template-rows: repeat(6, 1fr); /* Stack all containers vertically */
     }
 
-
-
     .container {
         padding: 5px; /* Reduce padding for smaller screens */
     }
@@ -611,7 +582,7 @@ h1, h2, h3 {
     }
 }
 
-@media (max-height: 800px) {
+/* @media (max-height: 800px) {
     .container {
         padding: 5px;
     }
@@ -619,4 +590,4 @@ h1, h2, h3 {
     button {
         font-size: 0.8rem;
     }
-}
+} */
