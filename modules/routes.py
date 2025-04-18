@@ -6,6 +6,7 @@ import logging
 from .monitor import SystemMonitor
 from .video_stream import video_stream  # Import the singleton instance
 from .gpio import motor_controller, servo_arm, servo_gripper, mp3_player
+from .sensor_interface import sensor_interface
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -153,19 +154,49 @@ def get_camera_type():
             'message': str(e)
         }), 503
 
+@routes.route('/ai/toggle', methods=['POST'])
+def toggle_ai():
+    """Toggle ai on/off"""
+    successful = True
+    message = "AI Mode Toggled Successfully"
+    try:
+        is_ai_mode  = video_stream.toggle_ai()
+    except Exception as e:
+        successful = False
+        message = e
+    return jsonify({
+        'status': 'success' if successful else 'error',
+        'streaming': is_ai_mode if successful else False,
+        'message': message
+    })
+
 @routes.route('/video/toggle', methods=['POST'])
 def toggle_video():
     """Toggle video stream on/off"""
+    successful = True
+    message = "Video stream toggled successfully"
     try:
         is_streaming = video_stream.toggle_stream()
-        return jsonify({
-            'status': 'success',
-            'streaming': is_streaming,
-            'message': 'Video stream toggled successfully'
-        })
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'streaming': False,
-            'message': str(e)
-        }), 503
+    except Excetion as e:
+        successful = False
+        message = str(e)
+    return jsonify({
+        'status': 'success' if successful else 'error',
+        'streaming': is_streaming if successful else False,
+        'message': message
+    })
+  
+@routes.route('/sensor-data')
+def sensor_data():
+    """Server-Sent Events endpoint for live sensor data."""
+    def generate():
+        while True:
+            try:
+                data = sensor_interface.get_latest_data()
+                if data:
+                    yield f"data: {json.dumps(data)}\n\n"
+                time.sleep(0.5)  # Adjust sampling rate as needed
+            except Exception as e:
+                print(f"Error in sensor-data SSE: {e}")
+                yield "data: {}\n\n"
+    return Response(generate(), mimetype='text/event-stream')

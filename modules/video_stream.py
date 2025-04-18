@@ -1,3 +1,6 @@
+import os.path
+from picamera2 import Picamera2
+from libcamera import controls
 import cv2
 import time
 import psutil
@@ -5,6 +8,7 @@ import logging
 import threading
 import queue
 import numpy as np
+from ultralytics import YOLO
 from typing import Generator, Tuple, Optional, Dict
 
 # Configure logging
@@ -16,8 +20,10 @@ class VideoStream:
         self.camera = None
         self.camera_type = None
         self.is_streaming = True
+        self.is_ai_mode = False
         self.lock = threading.Lock()
         self.frame_queue = queue.Queue(maxsize=queue_size)
+        self.yolo_model = self.init_ai()
 
         # Capture parameters
         self.target_fps = target_fps
@@ -45,17 +51,16 @@ class VideoStream:
         """Initialize camera with Pi Camera priority, fallback to USB."""
         # Try Pi Camera first
         try:
-            from picamera2 import Picamera2
-            from libcamera import controls
-
             logger.info("Attempting to initialize Pi Camera")
             self.camera = Picamera2()
 
             if not self.camera.sensor_modes:
                 raise RuntimeError("No Pi Camera detected - check camera connection")
 
-            config = self.camera.create_preview_configuration()
-            self.camera.configure(config)
+            self.camera.preview_configuration.main.size = (640, 480)
+            self.camera.preview_configuration.main.format = "RGB888"
+            self.camera.preview_configuration.align()
+            self.camera.configure('preview')
             self.camera.start()
 
             # Calculate µs/frame for target FPS and set controls
@@ -67,9 +72,8 @@ class VideoStream:
             })
 
             self.camera_type = 'picam'
-            logger.info("Pi Camera initialized successfully with configuration: %s", config)
             logger.info("Available sensor modes: %s", self.camera.sensor_modes)
-            self.stats['resolution'] = f'{config["main"]["size"][0]}x{config["main"]["size"][1]}'
+            self.stats['resolution'] = '640x480'
             return
         except Exception as e:
             logger.error("Pi Camera initialization failed: %s", str(e), exc_info=True)
@@ -91,10 +95,18 @@ class VideoStream:
 
         raise RuntimeError("No camera available (tried Pi Camera and USB)")
 
+    def init_ai(self):
+        # Compiling to ncnn for ARM based chips like rpi5
+        if not os.path.exists("./yolo11n_ncnn_model"):
+            YOLO("yolo11n.pt").export(format="ncnn")
+        return YOLO("./yolo11n_ncnn_model")
+
     def _capture_loop(self):
         """Continuously capture frames in a separate thread."""
         encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.jpeg_quality]
-        while self.is_streaming:
+        while True:
+            while not self.is_streaming:
+                continue
             frame = None
             try:
                 if self.camera_type == 'usb':
@@ -112,6 +124,10 @@ class VideoStream:
 
             if frame is None:
                 continue
+
+            if self.is_ai_mode:
+                # logger.info(self.yolo_model(frame)[0].plot())
+                frame = self.yolo_model(frame)[0].plot()
 
             # JPEG encode the frame
             success, buffer = cv2.imencode('.jpg', frame, encode_params)
@@ -172,21 +188,26 @@ class VideoStream:
         logger.info("Streaming %s", "started" if self.is_streaming else "stopped")
         return self.is_streaming
 
+    def toggle_ai(self) -> bool:
+        """Toggle ai mode."""
+        self.is_ai_mode = not self.is_ai_mode
+        logger.info("AI Mode  %s", "started" if self.is_streaming else "stopped")
+        return self.is_ai_mode
+
+
     def get_stats(self) -> Dict:
         """Get current streaming statistics."""
         with self.lock:
             return self.stats.copy()
 
     def __del__(self):
-        if hasattr(self, "camera") and self.camera:
-            try:
-                if self.camera_type == "usb":
-                    self.camera.release()
-                else:
-                    self.camera.close()
-            except Exception:
-                pass
-            logger.info("Camera resources released")
+        if not (hasattr(self, "camera") and self.camera):
+            return
+        try:
+            self.camera.release() if self.camera_type == "usb" else self.camera.close()
+        except Exception:
+            pass
+        logger.info("Camera resources released")
 
 
 # Create a singleton instance to be used across the application

@@ -12,6 +12,7 @@
     <script src="{{ url_for('static', filename='js/motor.js') }}"></script>
     <script src="{{ url_for('static', filename='js/servo.js') }}"></script>
     <script src="{{ url_for('static', filename='js/player.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sensor-data.js') }}"></script>
 </head>
 
 <body>
@@ -45,8 +46,8 @@
         </div>
         <h2>Sensor Feedback</h2>
         <div class="system-stats">
-            <p>Ultrasonic: <span id="ultrassonicSensor" class="stat-value">--mm</span></p>
-            <p>Lidar: <span id="lidarSensor" class="stat-value">--mm</span></p>
+            <p>Ultrasonic:<span id="ultrasonicSensor" class="stat-value"></span></p>
+            <p>LiDAR:<span id="lidarSensor" class="stat-value"></span></p>
         </div>
     </div>
 
@@ -89,7 +90,7 @@
 
 
     <div class="container" id="toggle-mode">
-        <button id="toggleMode">AI Mode</button>
+        <button id="toggleMode" class="ai-mode-btn">Enable AI Mode</button>
         <button id="gpioButton" class="gpio-btn">Toggle LED</button>
         <button id="helloButton">Say Hello</button>
     </div>
