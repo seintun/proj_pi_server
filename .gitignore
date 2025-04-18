@@ -38,3 +38,4 @@ camera_tests/test_files/
 yolo11n.pt
 yolo11n.torchscript
 yolo11n_ncnn_model
+src/*
