@@ -5,6 +5,7 @@ class VideoController {
         this.toggleBtn = document.querySelector('.video-toggle-btn');
         this.statusIcon = document.querySelector('.status-icon');
         this.statusText = document.querySelector('.status-text');
+        this.aiModeBtn = document.querySelector('.ai-mode-btn');
         this.cameraTypeIndicator = document.querySelector('.camera-type-indicator');
         
         // Video metrics elements
@@ -22,6 +23,9 @@ class VideoController {
     setupControls() {
         if (this.toggleBtn) {
             this.toggleBtn.addEventListener('click', () => this.toggleStream());
+        }
+        if (this.aiModeBtn) {
+            this.aiModeBtn.addEventListener('click', () => this.toggleAi());
         }
 
         // Handle video feed errors
@@ -91,6 +95,42 @@ class VideoController {
         if (this.qualityElement) this.qualityElement.textContent = '--%';
     }
 
+    async toggleAi() {
+        try {
+	    this.toggleAi.disabled = true; // Prevent double-clicks
+
+            if (this.aiModeBtn.textContent == "Enable AI Mode") {
+                this.aiModeBtn.textContent = "Disable AI Mode"
+            } else {
+                this.aiModeBtn.textContent = "Enable AI Mode"
+            }
+            
+            const response = await fetch('/ai/toggle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+
+            } else {
+                throw new Error(data.message || 'Failed to toggle AI Mode');
+            }
+        } catch (error) {
+            console.error('Error toggling AI Mode:', error);
+            this.showError(error.message);
+        } finally {
+	    this.toggleAi.disabled = false;
+        }
+    }
+
     async toggleStream() {
         try {
             this.toggleBtn.disabled = true; // Prevent double-clicks
@@ -115,7 +155,7 @@ class VideoController {
                 // Update video source if streaming is enabled
                 if (this.isStreaming) {
                     // Add timestamp to prevent caching
-                    this.feedImage.src = `/video_feed?t=${Date.now()}`;
+                    this.feedImage.src = `/video_feed`;
                 }
             } else {
                 throw new Error(data.message || 'Failed to toggle video stream');

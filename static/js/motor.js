@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const MOTOR_BASE_PATH = '/api/gpio/motor';
     const forwardButton = document.getElementById('forward_button');
     const leftButton = document.getElementById('left_button');
     const rightButton = document.getElementById('right_button');
@@ -16,20 +17,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const stopMotor = async () => {
         if (activeRequest) {
-            await fetch('/api/gpio/motor/stop', { method: 'POST' });
+            await fetch(`${MOTOR_BASE_PATH}/stop`, { method: 'POST' });
             activeRequest = null;
         }
     };
 
-    forwardButton?.addEventListener('mousedown', () => sendMotorCommand('/api/gpio/motor/forward'));
+    forwardButton?.addEventListener('mousedown', () => sendMotorCommand(`${MOTOR_BASE_PATH}/forward`));
     forwardButton?.addEventListener('mouseup', stopMotor);
 
-    leftButton?.addEventListener('mousedown', () => sendMotorCommand('/api/gpio/motor/left'));
+    leftButton?.addEventListener('mousedown', () => sendMotorCommand(`${MOTOR_BASE_PATH}/left`));
     leftButton?.addEventListener('mouseup', stopMotor);
 
-    rightButton?.addEventListener('mousedown', () => sendMotorCommand('/api/gpio/motor/right'));
+    rightButton?.addEventListener('mousedown', () => sendMotorCommand(`${MOTOR_BASE_PATH}/right`));
     rightButton?.addEventListener('mouseup', stopMotor);
 
-    backwardButton?.addEventListener('mousedown', () => sendMotorCommand('/api/gpio/motor/backward'));
+    backwardButton?.addEventListener('mousedown', () => sendMotorCommand(`${MOTOR_BASE_PATH}/backward`));
     backwardButton?.addEventListener('mouseup', stopMotor);
 });
+

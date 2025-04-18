@@ -1,7 +1,6 @@
 from flask import Flask
 from modules.routes import routes
 import logging
-import socket
 
 # Configure logging
 logging.basicConfig(
@@ -22,15 +21,6 @@ def create_app():
         TEMPLATES_AUTO_RELOAD=True,  # Enable template auto-reload
         SEND_FILE_MAX_AGE_DEFAULT=0  # Prevent caching of static files during development
     )
-
-    # For sensor data collection
-    with app.app_context():
-        """Start sensor data collection when the app starts."""
-        try:
-            sensor_interface.start_collection()
-            logger.info("Sensor data collection started successfully.")
-        except Exception as e:
-            logger.error(f"Failed to start sensor data collection: {e}")
     
     @app.after_request
     def add_header(response):
@@ -42,13 +32,28 @@ def create_app():
     
     return app
 
-if __name__ == '__main__':
-    app = create_app()
-    try:
-        # Get local IP address
-        hostname = socket.gethostname()
-        local_ip = socket.gethostbyname(hostname)
-        logger.info(f"Starting Robot Control Dashboard on {local_ip}:5000...")
-        app.run(host='0.0.0.0', port=5000, threaded=True)
-    except Exception as e:
-        logger.error(f"Error starting server: {e}")
+app = create_app()
+try:
+    host = '0.0.0.0'
+    port = 5000
+    logger.info(f"Starting Robot Control Dashboard at http://{host}:{port}")
+    app.run(host=host, port=port, threaded=True, debug=True)  # Enable debug mode
+except KeyboardInterrupt:
+    logger.info("Shutting down gracefully...")
+    from modules.video_stream import video_stream
+    from modules.gpio.motor import motor_controller
+    from modules.gpio.servo import servo_arm, servo_gripper
+
+    # Cleanup video stream
+    video_stream.cleanup()
+
+    # Cleanup motor controller
+    # motor_controller.cleanup()
+
+    # Cleanup servo controllers
+    servo_arm.cleanup()
+    servo_gripper.cleanup()
+
+    logger.info("Resources cleaned up. Exiting.")
+except Exception as e:
+    logger.error(f"Error starting server: {e}")
