@@ -80,7 +80,10 @@ class SensorInterface:
 
     def _read_ultrasonic_sensor(self) -> Dict[str, float]:
         """Read data from ultrasonic sensor using gpiozero"""
+        """Read data from ultrasonic sensor using gpiozero"""
         
+        TRIG_PIN = 16  # Replace with your actual TRIG pin number
+        ECHO_PIN = 26  # Replace with your actual ECHO pin number
         TRIG_PIN = 16  # Replace with your actual TRIG pin number
         ECHO_PIN = 26  # Replace with your actual ECHO pin number
 
@@ -129,7 +132,10 @@ class SensorInterface:
             logger.error(f"Error reading lidar sensor: {e}")
             distance = -1.0  # Indicate an error with a negative value
 
+            distance = -1.0  # Indicate an error with a negative value
+
         return {
+            'distance': distance,
             'distance': distance,
             'timestamp': time.time()
         }

@@ -5,6 +5,7 @@ import logging
 from .monitor import SystemMonitor
 from .video_stream import video_stream  # Import the singleton instance
 from .gpio import motor_controller, servo_arm, servo_gripper, mp3_player, encoder_tracker
+from .gpio import motor_controller, servo_arm, servo_gripper, mp3_player, encoder_tracker
 from .sensor_interface import sensor_interface
 from .saving import data_collector
 
@@ -89,6 +90,28 @@ def get_video_stats():
             'status': 'error',
             'message': str(e)
         }), 503
+
+@routes.route('/api/encoder/path')
+def encoder_path_stream():
+    def generate():
+        while True:
+            try:
+                # Get updated position
+                x, y, _ = encoder_tracker.vehicle_path()
+                # Format data with higher precision
+                data = {
+                    'x': float(round(x, 4)),
+                    'y': float(round(y, 4))
+                }
+                yield f"data: {json.dumps(data)}\n\n"
+                time.sleep(0.2)  # Update 10 times per second for smoother path
+            except Exception as e:
+                logger.error(f"Error streaming encoder path: {e}")
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+                time.sleep(1)  # Wait before retrying on error
+
+    return Response(generate(), mimetype='text/event-stream')
+
 
 @routes.route('/api/encoder/path')
 def encoder_path_stream():

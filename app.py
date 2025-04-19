@@ -31,7 +31,10 @@ def create_app():
             logger.info("Sensor data collection started successfully.")
         except Exception as e:
             logger.error(f"Failed to start sensor data collection: {e}")
-    
+
+    # Call the function during app initialization
+    start_sensor_collection()
+
     @app.after_request
     def add_header(response):
         """Add headers to prevent caching for SSE"""
