@@ -91,7 +91,7 @@ class servoControl:
             logger.error(f"Failed to enable PWM channel {self.pwm_channel}: {e}")
             raise
 
-    def smooth_move(self, start, end, steps=10, delay=0.02):
+    def smooth_move(self, start, end, steps=8, delay=0.02):
         if not self.enabled:
             logger.warning("Servo functionality is disabled. Cannot perform smooth_move.")
             return

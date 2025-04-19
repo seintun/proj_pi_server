@@ -2,6 +2,8 @@ from flask import Flask
 from modules.routes import routes
 import logging
 import socket
+from modules.sensor_interface import sensor_interface
+
 
 # Configure logging
 logging.basicConfig(
@@ -31,9 +33,6 @@ def create_app():
             logger.info("Sensor data collection started successfully.")
         except Exception as e:
             logger.error(f"Failed to start sensor data collection: {e}")
-
-    # Call the function during app initialization
-    start_sensor_collection()
 
     @app.after_request
     def add_header(response):

@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const MOTOR_BASE_PATH = '/api/gpio/motor';
-    const forwardButton = document.getElementById('forward_button');
-    const leftButton = document.getElementById('left_button');
-    const rightButton = document.getElementById('right_button');
-    const backwardButton = document.getElementById('backward_button');
+    const forwardButton = document.getElementById('up');
+    const leftButton = document.getElementById('left');
+    const rightButton = document.getElementById('right');
+    const backwardButton = document.getElementById('down');
 
     let activeRequest = null;
 

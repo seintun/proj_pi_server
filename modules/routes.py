@@ -112,28 +112,6 @@ def encoder_path_stream():
 
     return Response(generate(), mimetype='text/event-stream')
 
-
-@routes.route('/api/encoder/path')
-def encoder_path_stream():
-    def generate():
-        while True:
-            try:
-                # Get updated position
-                x, y, _ = encoder_tracker.vehicle_path()
-                # Format data with higher precision
-                data = {
-                    'x': float(round(x, 4)),
-                    'y': float(round(y, 4))
-                }
-                yield f"data: {json.dumps(data)}\n\n"
-                time.sleep(0.2)  # Update 10 times per second for smoother path
-            except Exception as e:
-                logger.error(f"Error streaming encoder path: {e}")
-                yield f"data: {json.dumps({'error': str(e)})}\n\n"
-                time.sleep(1)  # Wait before retrying on error
-
-    return Response(generate(), mimetype='text/event-stream')
-
 @routes.route('/api/gpio/motor/forward', methods=['POST'])
 def forward():
     motor_controller.forward()

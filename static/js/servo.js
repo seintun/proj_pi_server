@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const SERVO_BASE_PATH = '/api/gpio/servo';
-    const raiseButton = document.getElementById('raise_arm_button');
-    const lowerButton = document.getElementById('lower_arm_button');
-    const openButton = document.getElementById('open_gripper_button');
-    const closeButton = document.getElementById('close_gripper_button');
+    const raiseButton = document.getElementById('raiseArm');
+    const lowerButton = document.getElementById('lowerArm');
+    const openButton = document.getElementById('openGripper');
+    const closeButton = document.getElementById('closeGripper');
 
     let activeRequest = null;
 
