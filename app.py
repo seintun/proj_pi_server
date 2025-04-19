@@ -1,7 +1,7 @@
 from flask import Flask
 from modules.routes import routes
 import logging
-from modules.sensor_interface import sensor_interface
+import socket
 
 # Configure logging
 logging.basicConfig(
@@ -45,7 +45,10 @@ def create_app():
 if __name__ == '__main__':
     app = create_app()
     try:
-        logger.info("Starting Robot Control Dashboard...")
+        # Get local IP address
+        hostname = socket.gethostname()
+        local_ip = socket.gethostbyname(hostname)
+        logger.info(f"Starting Robot Control Dashboard on {local_ip}:5000...")
         app.run(host='0.0.0.0', port=5000, threaded=True)
     except Exception as e:
         logger.error(f"Error starting server: {e}")

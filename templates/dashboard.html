@@ -13,6 +13,8 @@
     <script src="{{ url_for('static', filename='js/servo.js') }}"></script>
     <script src="{{ url_for('static', filename='js/player.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sensor-data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/path.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/saving.js') }}"></script>
 </head>
 
 <body>
@@ -57,6 +59,7 @@
                 <h2>Camera Feed</h2>
                 <span class="camera-type-indicator">Loading...</span>
             </div>
+
             <div class="video-feed">
                 <div class="camera-status">
                     <div id="camera-status-icon" class="camera-status-icon"></div>
@@ -85,6 +88,10 @@
                         <span class="status-icon">🔴</span>
                         <span class="status-text">Stop Stream</span>
                     </button>
+                    <button class="saving-toggle-btn">
+                        <span class="saving-status-icon">⚪</span>
+                        <span class="saving-status-text">Start Recording</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -107,7 +114,7 @@
 
     <div class="grid-container" id="second-row">
         <div class="container" id="arm-gripper">
-            <button id="toggleMode">AI Mode</button>
+            <button id="toggleMode" class="ai-mode-btn">Enable AI Mode</button>
             <div class="arm-gripper">
                 <button id="raiseArm">Raise Arm</button>
                 <button id="openGripper">Open Gripper</button>
