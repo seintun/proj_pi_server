@@ -1,6 +1,7 @@
 import time
 import os
 import logging
+from builtins import open
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
