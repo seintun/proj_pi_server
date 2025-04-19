@@ -68,4 +68,4 @@ class DataCollector:
             time.sleep(interval)
 
 # Initialize the data collector with the training folder
-data_collector = DataCollector('/home/ArthurPI5/Projects/GitHub/proj_pi_server/modules/training')
+data_collector = DataCollector(f'{os.path.dirname(os.path.realpath(__file__))}/training')
