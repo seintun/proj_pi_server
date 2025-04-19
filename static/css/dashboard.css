@@ -7,54 +7,126 @@ body {
     background-color: #121212;
     color: #ffdb15;
     margin: 0;
-    padding: 0;
+    padding: 20px 0 20px 0; /* Remove any unnecessary padding */
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 10px;
-    height: 100vh;
+    gap: 0; /* Add consistent spacing between rows and columns */
+    height: 100vh; /* Full viewport height */
+    width: 100%; /* Ensure full width of the screen */
+    box-sizing: border-box; /* Include padding and borders in width/height calculations */
+    overflow: hidden; /* Prevent scrolling */
 }
 
-.container {
+/* First Row Grid */
+#first-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; /* 3 columns: middle column is wider */
+    gap: 20px; /* Add space between the containers */
+    width: 100%; /* Full width of the screen */
+    height: 50vh; /* Full height of its grid row */
+    padding: 0 20px;
+    margin-bottom: 10px;
+    box-sizing: border-box; /* Include padding and borders in width/height calculations */
+    overflow: hidden; /* Prevent overflow */
+}
+
+#first-row .container {
+    width: 100%; /* Take full width of their grid cell */
+    height: 100%; /* Take full height of their grid cell */
     background-color: #1E1E1E;
     border: 2px solid #ffdb15;
     border-radius: 15px;
-    padding: 20px;
+    padding: 10px; /* Internal padding for content */
+    margin: 0; /* Remove external margins to prevent overflow */
     box-shadow: 0 4px 15px #ffdb15;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     font-weight: bold;
+    box-sizing: border-box;
+    overflow: hidden;    
+}
+
+#second-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* 3 equal columns */
+    grid-template-rows: 1fr;
+    gap: 20px; /* Add space between the containers */
+    width: 100%; /* Full width of the screen */
+    height: 45vh; /* Full height of its grid row */
+    padding: 0 20px; /* Remove extra padding to avoid overflow */
+    margin-top: 0;
+    margin-bottom: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#second-row .container {
+    width: 100%; /* Take full width of their grid cell */
+    height: 100%; /* Take full height of their grid cell */
+    background-color: #1E1E1E;
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    padding: 10px; /* Internal padding for content */
+    margin: 0; /* Remove external margins to prevent overflow */
+    box-shadow: 0 4px 15px #ffdb15;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    box-sizing: border-box; /* Include padding and borders in width/height calculations */
+    overflow: hidden; /* Prevent content overflow */
+}
+
+.container {
+    background-color: #1E1E1E;
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    padding: 20px; 
+    margin: 10px;
+    box-shadow: 0 4px 15px #ffdb15;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+h1, h2, h3 {
+    font-size: clamp(1rem, 2vw, 2rem); /* Dynamically scale font size */
+    margin: 0;
 }
 
 /* Grid Layout */
 #system-stats { grid-column: 1; grid-row: 1; }
 #camera-feed { grid-column: 2; grid-row: 1; }
-#toggle-mode { grid-column: 3; grid-row: 1; }
-#robot-path { grid-column: 2; grid-row: 3; }
-#arm-gripper { grid-column: 1; grid-row: 3; }
-#joystick { grid-column: 3; grid-row: 3; }
+#live-charts { grid-column: 3; grid-row: 1; }
+#robot-path { grid-column: 2; grid-row: 2; }
+#arm-gripper { grid-column: 1; grid-row: 2; }
+#joystick { grid-column: 3; grid-row: 2; }
 
-/* Charts Container */
-.charts-container {
-    grid-column: span 3;
-    grid-row: 2;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    padding: 15px;
-    background: #1E1E1E;
-    border: 2px solid #ffdb15;
-    border-radius: 15px;
-    margin: 10px;
+/* Ensure all containers have the same width */
+#arm-gripper, #robot-path, #joystick {
+    width: 100%; /* Take full width of their grid cell */
+    grid-column: auto;
+    grid-row: auto;
+}
+
+.chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box;
 }
 
 .chart-wrapper {
+    width: 90%;
     height: 150px;
     background: #000;
     border-radius: 10px;
     padding: 15px;
+    margin-bottom: 20px;
     border: 1px solid #ffdb15;
     position: relative;
     overflow: hidden;
@@ -78,20 +150,28 @@ body {
 }
 
 /* System Stats and Sensor Data */
-.system-stats {
-    width: 100%;
+#system-stats {
+    display: flex;
+    flex-direction: column; /* Stack contents vertically */
+    justify-content: center; /* Center contents vertically */
+    align-items: center; /* Center contents horizontally */
+    width: 100%; /* Full width of the grid cell */
+    height: 100%; /* Full height of the grid cell */
+    background-color: #1E1E1E;
     border: 2px solid #ffdb15;
-    border-radius: 10px;
-    background-color: #000;
-    padding: 15px;
-    box-sizing: border-box;
-    box-shadow: 0 0 20px #ffdb15;
-    font-size: 16px;
-    margin-bottom: 15px;
+    border-radius: 15px;
+    padding: 10px; /* Internal padding for content */
+    margin: 0; /* Remove external margins */
+    box-shadow: 0 4px 15px #ffdb15;
+    overflow: hidden; /* Prevent content overflow */
+    box-sizing: border-box; /* Include padding and borders in width/height calculations */
 }
 
-.stat-group {
-    margin-bottom: 15px;
+#system-stats .stat-group {
+    width: 100%; /* Ensure the stat group takes full width */
+    text-align: center; /* Center-align text */
+    font-size: clamp(0.8rem, 1.5vw, 1.2rem); /* Dynamically scale font size */
+    margin-bottom: 10px; /* Add spacing between groups */
 }
 
 .stat-group h3 {
@@ -101,25 +181,29 @@ body {
     text-shadow: 0 0 5px #ffdb15;
 }
 
-.stat-list {
-    list-style: none;
+#system-stats .system-stats p {
+    text-align: left; /* Align the text to the left */
+    margin: 5px 0; /* Add spacing between the lines */
+    font-size: 1rem; /* Ensure consistent font size */    
+}
+
+#system-stats .stat-list {
+    list-style: none; /* Remove bullet points */
     padding: 0;
     margin: 0;
+    font-size: clamp(0.7rem, 1.2vw, 1rem); /* Dynamically scale font size */
 }
 
-.stat-list li {
-    margin: 5px 0;
+#system-stats .stat-list li {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
+    justify-content: space-between; /* Align label and value */
+    margin: 5px 0;
 }
 
-.stat-value {
-    color: #ffdb15;
+#system-stats .stat-value {
     font-weight: bold;
+    color: #ffdb15;
     text-shadow: 0 0 5px #ffdb15;
-    margin-left: 10px;
 }
 
 .memory-line {
@@ -203,20 +287,42 @@ body {
     color: #ffdb15;
 }
 
-.video-feed {
+#camera-feed {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the camera feed horizontally */
+    justify-content: center; /* Center the camera feed vertically */
+    padding: 10px; /* Add spacing around the video feed */
+    background-color: #1E1E1E; /* Optional: Background color for the container */
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    box-sizing: border-box; /* Include padding in width/height calculations */
+    overflow: hidden; /* Prevent content overflow */
     width: 100%;
     height: 100%;
+    max-width: none; /* Limit the maximum width of the camera feed */
+    margin: 0 auto; /* Center the container on the page */
+}
+
+.video-feed {
+    width: 100%;
+    height: 0;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
     border: 2px solid #ffdb15;
     border-radius: 10px;
     background-color: #000;
     overflow: hidden;
     position: relative;
+    box-sizing: border-box;
 }
 
 .video-feed img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 8px;
     background-color: #000; /* Ensure a neutral background */
     image-rendering: auto; /* Prevent forced pixelation or color distortion */
@@ -276,8 +382,8 @@ body {
 
 .video-controls {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
+    bottom: 60px;
+    right: 20px;
     z-index: 10;
 }
 
@@ -325,24 +431,24 @@ body {
 }
 
 .saving-toggle-btn {
-    width: 80%; /* Match size of #helloButton and #toggleMode */
-    height: 50px; /* Match size of #helloButton and #toggleMode */
-    font-size: 1.2em; /* Match font size */
-    font-family: 'Roboto Mono', monospace; /* Match font */
-    background-color: #ffdb15; /* Match background color */
-    color: #121212; /* Match text color */
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin: 5px;
-    box-shadow: 0 4px 10px #ffdb15;
+    width: auto !important;
+    height: 40px !important;
+    padding: 0 15px;
+    font-size: 14px !important;
+    background: rgba(30, 30, 30, 0.8);
+    border: 1px solid #ffdb15;
+    color: #ffdb15;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.8;
     transition: all 0.3s ease;
-    font-weight: bold;
 }
 
 .saving-toggle-btn:active {
-    background-color: #fcc303; /* Match active state color */
-    box-shadow: 0 0 15px #fcc303, 0 0 30px #fcc303;
+    background-color: red;
+    color: red;
+    box-shadow: 0 0 15px red, 0 0 30px red;
 }
 
 .saving-status-icon {
@@ -353,28 +459,76 @@ body {
 
 .saving-toggle-btn.recording .saving-status-icon {
     animation: blink 1s infinite;
+    color: red;
 }
 
 /* Controls */
-button {
-    width: 80%;
-    height: 50px;
-    font-size: 1.2em;
+#arm-gripper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #1E1E1E;
+    border: 2px solid #ffdb15;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 15px #ffdb15;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.arm-gripper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    grid-template-rows: repeat(2, 1fr); /* 2 rows */
+    gap: 15px; /* Add spacing between buttons */
+    width: 100%; /* Full width of the container */
+    height: auto; /* Adjust height dynamically */
+    justify-items: center; /* Center buttons horizontally */
+    align-items: center; /* Center buttons vertically */
+}
+
+.arm-gripper button {
+    width: 80px; /* Set a fixed width */
+    height: 80px; /* Set the height equal to the width to make it a square */
+    font-size: 0.9rem; /* Adjust font size to fit within the square */
     font-family: 'Roboto Mono', monospace;
     background-color: #ffdb15;
     color: #121212;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    margin: 5px;
     box-shadow: 0 4px 10px #ffdb15;
     transition: all 0.3s ease;
     font-weight: bold;
+    text-align: center; /* Center text inside the button */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
 }
 
-button:active {
-    background-color: #fcc303;
-    box-shadow: 0 0 15px #fcc303, 0 0 30px #fcc303;
+#toggleMode {
+    width: 85%; /* Keep the button width consistent */
+    height: 50px; /* Set a consistent height */
+    font-size: 1rem; /* Match the font size of other buttons */
+    font-family: 'Roboto Mono', monospace;
+    background-color: #ffdb15;
+    color: #121212;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px #ffdb15;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    text-align: center; /* Center text inside the button */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    margin-bottom: 20px; /* Add spacing below the button */
+    position: relative; /* Allow positioning adjustments */
+    top: -10px; /* Move the button higher */
 }
 
 /* Joystick Controls */
@@ -388,10 +542,19 @@ button:active {
 }
 
 .joystick button {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-    border-radius: 50%;
+    width: 80px; /* Increase the width */
+    height: 80px; /* Increase the height to match the width */
+    font-size: 28px; /* Adjust font size for larger buttons */
+    border-radius: 50%; /* Keep the buttons circular */
+    background-color: #ffdb15; /* Optional: Ensure consistent styling */
+    color: #121212; /* Optional: Text color */
+    border: none;
+    box-shadow: 0 4px 10px #ffdb15;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Critical Value Indicators */
@@ -438,8 +601,16 @@ button:active {
 /* Responsive Design */
 @media (max-width: 1200px) {
     body {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
+        grid-template-columns: 1fr; /* Single column layout */
+        grid-template-rows: repeat(6, 1fr); /* Stack all containers vertically */
+    }
+
+    .container {
+        padding: 5px; /* Reduce padding for smaller screens */
+    }
+
+    .video-feed {
+        padding-top: 75%; /* Adjust aspect ratio for smaller screens */
     }
     
     .charts-container {
@@ -451,3 +622,13 @@ button:active {
         height: 120px;
     }
 }
+
+/* @media (max-height: 800px) {
+    .container {
+        padding: 5px;
+    }
+
+    button {
+        font-size: 0.8rem;
+    }
+} */
