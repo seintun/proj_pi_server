@@ -57,10 +57,8 @@ class VideoStream:
             if not self.camera.sensor_modes:
                 raise RuntimeError("No Pi Camera detected - check camera connection")
 
-            self.camera.preview_configuration.main.size = (640, 480)
-            self.camera.preview_configuration.main.format = "RGB888"
-            self.camera.preview_configuration.align()
-            self.camera.configure('preview')
+            config = self.camera.create_preview_configuration()
+            self.camera.configure(config)
             self.camera.start()
 
             # Calculate µs/frame for target FPS and set controls
@@ -73,7 +71,7 @@ class VideoStream:
 
             self.camera_type = 'picam'
             logger.info("Available sensor modes: %s", self.camera.sensor_modes)
-            self.stats['resolution'] = '640x480'
+            self.stats['resolution'] = f'{config["main"]["size"][0]}x{config["main"]["size"][1]}'
             return
         except Exception as e:
             logger.error("Pi Camera initialization failed: %s", str(e), exc_info=True)
@@ -114,10 +112,14 @@ class VideoStream:
                     if not success or frame is None:
                         logger.error("Failed to read from USB camera")
                         continue
+                    # Convert BGR to RGB for consistent color representation
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     # Optional: Flip the frame horizontally
                     frame = cv2.flip(frame, 1)
                 else:  # picam
                     frame = self.camera.capture_array()
+                    # Ensure frame is in RGB format
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             except Exception as e:
                 logger.error("Error capturing frame: %s", str(e))
                 continue

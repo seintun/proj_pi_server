@@ -4,8 +4,10 @@ from typing import Dict, Optional, List
 import threading
 from queue import Queue
 import json
-import random
-import RPi.GPIO as GPIO
+from gpiozero import DistanceSensor
+import board
+import busio
+import adafruit_vl53l0x
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -17,6 +19,23 @@ class SensorInterface:
         self.is_collecting = False
         self._collection_thread = None
         self._lock = threading.Lock()
+        self._lidar = None
+
+        # Initialize the VL53L0X sensor
+        try:
+            logger.info("Initializing VL53L0X sensor...")
+            i2c = busio.I2C(board.SCL, board.SDA)
+            self._lidar = adafruit_vl53l0x.VL53L0X(i2c)
+            self._lidar.measurement_timing_budget = 200000  # Optional: Set timing budget
+            time.sleep(0.1)  # Allow sensor to stabilize
+            logger.info("VL53L0X sensor initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize VL53L0X sensor: {e}")
+            self._lidar = None
+
+        # Start collection automatically upon initialization
+        self.start_collection()
+        logger.info("SensorInterface initialized and data collection started")
 
     def start_collection(self) -> None:
         """Start collecting sensor data in a separate thread."""
@@ -34,82 +53,84 @@ class SensorInterface:
 
     def _collect_data(self) -> None:
         """Continuously collect data from sensors."""
+        interval = 0.5  # Match the interval with the data collector
         while self.is_collecting:
             try:
                 # Real-time sensor readings
                 ultrasonic_reading = self._read_ultrasonic_sensor()
                 lidar_reading = self._read_lidar_sensor()
-                
+
+                # Check if ultrasonic sensor distance is greater than 100 cm
+                if ultrasonic_reading['distance'] > 100:
+                    lidar_reading['distance'] = "Out of range"
+
                 with self._lock:
                     self.sensor_data.update({
                         'ultrasonic': ultrasonic_reading,
                         'lidar': lidar_reading
                     })
-                
+
                 logger.debug(f"Ultrasonic Reading: {ultrasonic_reading}")
                 logger.debug(f"Lidar Reading: {lidar_reading}")
-                
+
             except Exception as e:
                 logger.error(f"Error collecting sensor data: {e}")
-                
-            time.sleep(0.5)  # Wait before retrying
+
+            time.sleep(interval)  # Adjusted interval
 
     def _read_ultrasonic_sensor(self) -> Dict[str, float]:
-        """Read data from ultrasonic sensor using GPIO"""
+        """Read data from ultrasonic sensor using gpiozero"""
         
-        TRIG_PIN = 23  # Replace with your actual TRIG pin number
-        ECHO_PIN = 24  # Replace with your actual ECHO pin number
+        TRIG_PIN = 16  # Replace with your actual TRIG pin number
+        ECHO_PIN = 26  # Replace with your actual ECHO pin number
 
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(TRIG_PIN, GPIO.OUT)
-        GPIO.setup(ECHO_PIN, GPIO.IN)
+        try:
+            # Set max_distance to 4.0 meters (400 cm)
+            sensor = DistanceSensor(echo=ECHO_PIN, trigger=TRIG_PIN, max_distance=9.0)
+            raw_distance_1 = sensor.distance * 100  # Convert to cm
+            raw_distance_2 = 1.0029 * raw_distance_1 + 0.2654
+            distance = round(raw_distance_2, 2)
 
-        # Send a 10us pulse to trigger the sensor
-        GPIO.output(TRIG_PIN, True)
-        time.sleep(0.00001)
-        GPIO.output(TRIG_PIN, False)
-
-        # Measure the time for the echo to return
-        pulse_start = time.time()
-        pulse_end = time.time()
-
-        while GPIO.input(ECHO_PIN) == 0:
-            pulse_start = time.time()
-
-        while GPIO.input(ECHO_PIN) == 1:
-            pulse_end = time.time()
-
-        # Calculate distance in cm
-        pulse_duration = pulse_end - pulse_start
-        distance = (pulse_duration * 34300) / 2
-        distance = round(distance, 2)
-
-        # Cleanup GPIO
-        GPIO.cleanup()
+            # Check if the distance exceeds the maximum range
+            if raw_distance_1 > 400:  # 400 cm is the max_distance in cm
+                return {
+                    'distance': "Out of range",
+                    'timestamp': time.time()
+                }
+        except Exception as e:
+            logger.error(f"Error reading ultrasonic sensor: {e}")
+            distance = -1.0  # Indicate an error with a negative value
 
         return {
             'distance': distance,
             'timestamp': time.time()
         }
-    
-    def _read_lidar_sensor(self) -> Dict[str, float]:
-        """Read data from lidar sensor"""
-        distance = 0.0
-        try:
-            import smbus
-            # Replace with your actual I2C address and setup
-            I2C_ADDRESS = 0x29  # Default I2C address for VL53L0X.
-            bus = smbus.SMBus(1)  # Use I2C bus 1
 
-            # Example: Read distance from VL53L0X
-            # You will need to use the appropriate library or commands for your lidar sensor
-            # This is a placeholder for actual lidar reading logic
-            distance = random.uniform(50.0, 200.0)  # Replace with actual reading logic
+    def _read_lidar_sensor(self) -> Dict[str, float]:
+        """Read data from VL53L0X lidar sensor."""
+        if not self._lidar:
+            logger.debug("Lidar sensor not initialized (_lidar is None)")
+            return {
+                'distance': -1.0,
+                'timestamp': time.time()
+            }
+
+        try:
+            logger.debug("Attempting to read distance from lidar...")
+            distance_mm = self._lidar.range
+            if distance_mm < 30 or distance_mm > 1000:  # Validate range (0-1000mm typical for VL53L0X)
+                logger.warning(f"Invalid lidar reading: {distance_mm}mm")
+                distance_mm = -1.0
+            logger.debug(f"Validated distance reading: {distance_mm}mm")
+            raw_distance_1 = distance_mm / 10  # Convert mm to cm
+            raw_distance_2 = 6e-10 * raw_distance_1**6 - 2e-7 * raw_distance_1**5 + 3e-5 * raw_distance_1**4 - 0.0023 * raw_distance_1**3 + 0.0817 * raw_distance_1**2 - 0.3912 * raw_distance_1 + 4.7317
+            distance = round(raw_distance_2, 2)
         except Exception as e:
             logger.error(f"Error reading lidar sensor: {e}")
-            
+            distance = -1.0  # Indicate an error with a negative value
+
         return {
-            'distance': round(distance, 2),
+            'distance': distance,
             'timestamp': time.time()
         }
 

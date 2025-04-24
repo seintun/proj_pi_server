@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, Response, send_file, jsonify, request
 import json
 import time
-import os
 import logging
 from .monitor import SystemMonitor
 from .video_stream import video_stream  # Import the singleton instance
-from .gpio import motor_controller, servo_arm, servo_gripper, mp3_player
+from .gpio import motor_controller, servo_arm, servo_gripper, mp3_player, encoder_tracker
 from .sensor_interface import sensor_interface
+from .saving import data_collector
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 routes = Blueprint('routes', __name__)
 system_monitor = SystemMonitor()
+is_recording = False  # Track recording state
 
 @routes.route('/')
 def index():
@@ -88,7 +89,28 @@ def get_video_stats():
             'status': 'error',
             'message': str(e)
         }), 503
-    
+
+@routes.route('/api/encoder/path')
+def encoder_path_stream():
+    def generate():
+        while True:
+            try:
+                # Get updated position
+                x, y, _ = encoder_tracker.vehicle_path()
+                # Format data with higher precision
+                data = {
+                    'x': float(round(x, 4)),
+                    'y': float(round(y, 4))
+                }
+                yield f"data: {json.dumps(data)}\n\n"
+                time.sleep(0.2)  # Update 10 times per second for smoother path
+            except Exception as e:
+                logger.error(f"Error streaming encoder path: {e}")
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+                time.sleep(1)  # Wait before retrying on error
+
+    return Response(generate(), mimetype='text/event-stream')
+
 @routes.route('/api/gpio/motor/forward', methods=['POST'])
 def forward():
     motor_controller.forward()
@@ -200,3 +222,18 @@ def sensor_data():
                 print(f"Error in sensor-data SSE: {e}")
                 yield "data: {}\n\n"
     return Response(generate(), mimetype='text/event-stream')
+
+@routes.route('/api/recording/toggle', methods=['POST'])
+def toggle_recording():
+    """Toggle the recording state."""
+    global is_recording
+    if is_recording:
+        data_collector.stop_collection()
+    else:
+        data_collector.start_collection()
+    is_recording = not is_recording
+    return jsonify({
+        'status': 'success',
+        'recording': is_recording,
+        'message': 'Recording state toggled successfully'
+    })

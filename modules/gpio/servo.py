@@ -1,6 +1,7 @@
 import time
 import os
 import logging
+from builtins import open
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -18,8 +19,8 @@ class servoControl:
 
         # Define positions of the servos
         # Typical range is 500000 (0°) to 2500000 (180°)
-        self.up_position = 1600000
-        self.down_position = 1300000
+        self.up_position = 1650000
+        self.down_position = 1500000
         self.closed_position = 2400000
         self.opened_position = 1500000
         self.current_position_arm = initial_position
@@ -49,12 +50,18 @@ class servoControl:
         if not self.enabled:
             return
         channel_number = self.pwm_channel.replace("pwm", "")
-        if not os.path.exists(self.pwm_path):
-            with open(f"{self.pwm_chip}/export", "w") as f:
-                f.write(channel_number)
-            time.sleep(0.1)
-            while not os.path.exists(self.pwm_path):
+        try:
+            if not os.path.exists(self.pwm_path):
+                logger.info(f"Exporting PWM channel {channel_number} at {self.pwm_chip}.")
+                with open(f"{self.pwm_chip}/export", "w") as f:
+                    f.write(channel_number)
                 time.sleep(0.1)
+                while not os.path.exists(self.pwm_path):
+                    time.sleep(0.1)
+            logger.info(f"PWM channel {channel_number} successfully exported.")
+        except Exception as e:
+            logger.error(f"Failed to export PWM channel {channel_number}: {e}")
+            raise
 
     def set_period(self, period_ns):
         if not self.enabled:
@@ -75,8 +82,14 @@ class servoControl:
     def enable_pwm(self):
         if not self.enabled:
             return
-        with open(f"{self.pwm_path}/enable", "w") as f:
-            f.write("1")
+        try:
+            logger.info(f"Enabling PWM channel {self.pwm_channel}.")
+            with open(f"{self.pwm_path}/enable", "w") as f:
+                f.write("1")
+            logger.info(f"PWM channel {self.pwm_channel} successfully enabled.")
+        except Exception as e:
+            logger.error(f"Failed to enable PWM channel {self.pwm_channel}: {e}")
+            raise
 
     def smooth_move(self, start, end, steps=10, delay=0.02):
         if not self.enabled:
@@ -130,15 +143,20 @@ class servoControl:
             f.write(channel_number)
 
 servo_arm = servoControl(
-    pwm_chip="/sys/class/pwm/pwmchip2",
+    pwm_chip="/sys/class/pwm/pwmchip0",
     pwm_channel="pwm2",
     gpio_name="GPIO18",
-    initial_position=1300000
+    initial_position=1500000
 )
 
 servo_gripper = servoControl(
-    pwm_chip="/sys/class/pwm/pwmchip2",
+    pwm_chip="/sys/class/pwm/pwmchip0",
     pwm_channel="pwm3",
-    gpio_name="GPIO13",
+    gpio_name="GPIO19",
     initial_position=1500000
 )
+
+if not servo_arm.enabled:
+    logger.error("Servo arm initialization failed. Check PWM configuration.")
+if not servo_gripper.enabled:
+    logger.error("Servo gripper initialization failed. Check PWM configuration.")
