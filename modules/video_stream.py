@@ -57,11 +57,15 @@ class VideoStream:
             if not self.camera.sensor_modes:
                 raise RuntimeError("No Pi Camera detected - check camera connection")
 
-            config = self.camera.create_preview_configuration()
+            # Create still configuration for maximum resolution
+            config = self.camera.create_still_configuration(
+                main={"size": (1640, 1232)},  # Changed to max resolution
+                display="main"
+            )
             self.camera.configure(config)
             self.camera.start()
 
-            # Calculate µs/frame for target FPS and set controls
+            # Adjust frame time for higher resolution (might need to lower FPS)
             frame_time = int(1_000_000 / self.target_fps)
             self.camera.set_controls({
                 "AeEnable": True,
@@ -83,6 +87,8 @@ class VideoStream:
         for device in [0, 1]:
             cap = cv2.VideoCapture(device)
             if cap.isOpened():
+                cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
                 self.camera = cap
                 self.camera_type = 'usb'
                 width = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH))

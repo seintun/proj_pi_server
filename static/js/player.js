@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const helloButton = document.getElementById('helloButton');
+    const helloButton = document.getElementById('sayHello');
 
     let activeRequest = null;
 

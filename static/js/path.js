@@ -83,7 +83,7 @@ class PathGraph {
         ctx.stroke();
 
         ctx.fillStyle = '#ffdb15';
-        ctx.font = '12px "Roboto Mono", monospace';
+        ctx.font = '15px "Roboto Mono", monospace';
         ctx.fillText('Robot Path', legendX + 40, legendY + 5);
 
         // Current position legend

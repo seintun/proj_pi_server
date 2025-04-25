@@ -7,9 +7,9 @@ body {
     background-color: #121212;
     color: #ffdb15;
     margin: 0;
-    padding: 20px 0 20px 0; /* Remove any unnecessary padding */
+    /*padding: 20px 0 20px 0; /* Remove any unnecessary padding */
     display: grid;
-    gap: 0; /* Add consistent spacing between rows and columns */
+    /*gap: 0; /* Add consistent spacing between rows and columns */
     height: 100vh; /* Full viewport height */
     width: 100%; /* Ensure full width of the screen */
     box-sizing: border-box; /* Include padding and borders in width/height calculations */
@@ -19,10 +19,10 @@ body {
 /* First Row Grid */
 #first-row {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr; /* 3 columns: middle column is wider */
+    grid-template-columns: 1fr 1fr 1fr; /* 3 columns: middle column is wider */
     gap: 20px; /* Add space between the containers */
     width: 100%; /* Full width of the screen */
-    height: 50vh; /* Full height of its grid row */
+    height: 55vh;
     padding: 0 20px;
     margin-bottom: 10px;
     box-sizing: border-box; /* Include padding and borders in width/height calculations */
@@ -53,7 +53,7 @@ body {
     grid-template-rows: 1fr;
     gap: 20px; /* Add space between the containers */
     width: 100%; /* Full width of the screen */
-    height: 45vh; /* Full height of its grid row */
+    height: 43vh;
     padding: 0 20px; /* Remove extra padding to avoid overflow */
     margin-top: 0;
     margin-bottom: 0;
@@ -80,22 +80,33 @@ body {
 }
 
 .container {
+    position: relative; /* Add this to enable absolute positioning of titles */
     background-color: #1E1E1E;
     border: 2px solid #ffdb15;
     border-radius: 15px;
-    padding: 20px; 
-    margin: 10px;
+    padding: 10px; 
+    margin: 5px;
     box-shadow: 0 4px 15px #ffdb15;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-evenly; /* Changed from center to flex-start */
     align-items: center;
     font-weight: bold;
     overflow: hidden;
 }
 
 h1, h2, h3 {
-    font-size: clamp(1rem, 2vw, 2rem); /* Dynamically scale font size */
+    font-size: clamp(1rem, 1.2vw, 1.5rem); /* Reduced font size range */
+    margin: 0;
+}
+
+.container h2 {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: clamp(0.8rem, 1.5vw, 1.5rem);
     margin: 0;
 }
 
@@ -125,8 +136,7 @@ h1, h2, h3 {
     height: 150px;
     background: #000;
     border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
+    margin: 15px;
     border: 1px solid #ffdb15;
     position: relative;
     overflow: hidden;
@@ -160,7 +170,6 @@ h1, h2, h3 {
     background-color: #1E1E1E;
     border: 2px solid #ffdb15;
     border-radius: 15px;
-    padding: 10px; /* Internal padding for content */
     margin: 0; /* Remove external margins */
     box-shadow: 0 4px 15px #ffdb15;
     overflow: hidden; /* Prevent content overflow */
@@ -169,6 +178,7 @@ h1, h2, h3 {
 
 #system-stats .stat-group {
     width: 100%; /* Ensure the stat group takes full width */
+    padding-top: 20px;
     text-align: center; /* Center-align text */
     font-size: clamp(0.8rem, 1.5vw, 1.2rem); /* Dynamically scale font size */
     margin-bottom: 10px; /* Add spacing between groups */
@@ -181,10 +191,31 @@ h1, h2, h3 {
     text-shadow: 0 0 5px #ffdb15;
 }
 
+.sensor-feedback{
+    color: #ffdb15;
+    font-size: 16px;
+    margin: 0 0 10px 0;
+    text-shadow: 0 0 5px #ffdb15;
+}
+
+#system-stats .system-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Increase spacing between elements */
+    width: 100%;
+}
+
 #system-stats .system-stats p {
-    text-align: left; /* Align the text to the left */
-    margin: 5px 0; /* Add spacing between the lines */
-    font-size: 1rem; /* Ensure consistent font size */    
+    text-align: left;
+    padding-top: 10px;
+    padding-left: 30%;
+    margin: 5px 0;
+    font-size: 1rem;
+}
+
+#system-stats .system-stats p .stat-value {
+    position: absolute;
+    left: 55%;
 }
 
 #system-stats .stat-list {
@@ -270,8 +301,10 @@ h1, h2, h3 {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 10px;
+    justify-content: space-between; /* Change from default to space-between */
+    gap: 10px;
+    margin-bottom: 5px;
+    padding: 0 10px; /* Add some horizontal padding */
 }
 
 .camera-header h2 {
@@ -282,7 +315,7 @@ h1, h2, h3 {
     background: rgba(30, 30, 30, 0.8);
     border: 1px solid #ffdb15;
     border-radius: 4px;
-    padding: 4px 8px;
+    padding: 8px 8px;
     font-size: 14px;
     color: #ffdb15;
 }
@@ -290,12 +323,11 @@ h1, h2, h3 {
 #camera-feed {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center the camera feed horizontally */
-    justify-content: center; /* Center the camera feed vertically */
-    padding: 10px; /* Add spacing around the video feed */
+    align-items: center;
+    justify-content: flex-start; /* Change from center to flex-start */
     background-color: #1E1E1E; /* Optional: Background color for the container */
     border: 2px solid #ffdb15;
-    border-radius: 15px;
+    border-radius: 10px;
     box-sizing: border-box; /* Include padding in width/height calculations */
     overflow: hidden; /* Prevent content overflow */
     width: 100%;
@@ -306,23 +338,26 @@ h1, h2, h3 {
 
 .video-feed {
     width: 100%;
-    height: 0;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    height: calc(100% - 20px); /* Subtract space for header and controls */
     border: 2px solid #ffdb15;
     border-radius: 10px;
     background-color: #000;
     overflow: hidden;
     position: relative;
     box-sizing: border-box;
+    margin: 5px 5px 5px 5px; /* Top Right Bottom Left - bottom margin is double */
 }
 
 .video-feed img {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Change from contain to cover if you want to fill the space */
     border-radius: 8px;
     background-color: #000; /* Ensure a neutral background */
     image-rendering: auto; /* Prevent forced pixelation or color distortion */
@@ -382,8 +417,8 @@ h1, h2, h3 {
 
 .video-controls {
     position: absolute;
-    bottom: 60px;
-    right: 20px;
+    bottom: 10px;
+    right: 10px;
     z-index: 10;
 }
 
@@ -392,6 +427,7 @@ h1, h2, h3 {
     height: 40px !important;
     padding: 0 15px;
     font-size: 14px !important;
+    font-weight: bold;
     background: rgba(30, 30, 30, 0.8);
     border: 1px solid #ffdb15;
     color: #ffdb15;
@@ -435,6 +471,7 @@ h1, h2, h3 {
     height: 40px !important;
     padding: 0 15px;
     font-size: 14px !important;
+    font-weight: bold;
     background: rgba(30, 30, 30, 0.8);
     border: 1px solid #ffdb15;
     color: #ffdb15;
@@ -575,12 +612,32 @@ h1, h2, h3 {
     75% { transform: translateX(5px); }
 }
 
-/* Path Display */
-.path-display {
-    width: 450px; /* Updated width */
-    height: 450px; /* Updated height */
+.robot-path-container {
+    position: relative; /* Add this to enable absolute positioning of titles */
+    background-color: #1E1E1E;
     border: 2px solid #ffdb15;
-    border-radius: 10px;
+    border-radius: 15px;
+    margin: 5px;
+    box-shadow: 0 4px 15px #ffdb15;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Changed from center to flex-start */
+    align-items: center;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+#robot-path {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.path-display {
+    width: 100%; /* Responsive width but max 400px */
+    height: 100%; /* Height will be determined by aspect-ratio */
+    border-radius: 15px;
     background-color: #000;
     overflow: hidden;
     position: relative;
@@ -610,7 +667,8 @@ h1, h2, h3 {
     }
 
     .video-feed {
-        padding-top: 75%; /* Adjust aspect ratio for smaller screens */
+        padding-top: 0; /* Remove the fixed aspect ratio */
+        height: calc(100% - 60px); /* Use the same calculation as above */
     }
     
     .charts-container {
@@ -622,13 +680,3 @@ h1, h2, h3 {
         height: 120px;
     }
 }
-
-/* @media (max-height: 800px) {
-    .container {
-        padding: 5px;
-    }
-
-    button {
-        font-size: 0.8rem;
-    }
-} */
