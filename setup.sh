@@ -34,6 +34,10 @@ sudo apt update && sudo apt install -y \
 	python3-picamera2 \
 	python3-sip
 
+pip-compile requirements.in
+
 # pip install -r requirements.txt
 pip install -r requirements.txt --no-cache-dir 
+
+echo -e "\033[0;33mRun 'python3 app.py' to start the program\033[0m"
 
